@@ -1,63 +1,54 @@
 # SBoard Test Task
 
-Веб-проект по мотивам тестового задания:
-https://docs.google.com/document/d/1RKVCzOrDry7oCpri5HKzLpWlmH35ddcB2_SV9Y1zjf0/edit?tab=t.0
-
+Веб-приложение на TypeScript: Pixi.js + Skia (CanvasKit), обёртка рендера Pixi-контейнера в Skia.
 
 ## Стек
 
-- [Pixi.js](https://pixijs.com/) — WebGL/WebGPU-рендеринг
-- [canvaskit-wasm](https://www.npmjs.com/package/canvaskit-wasm) — Skia, скомпилированная в WebAssembly для браузера
-- [Vite](https://vite.dev/) — сборка и dev-сервер
+- [Pixi.js](https://pixijs.com/) — интерактивная сцена (WebGL)
+- [canvaskit-wasm](https://www.npmjs.com/package/canvaskit-wasm) — Skia в браузере
+- [Vite](https://vite.dev/) + TypeScript
 
 ## Требования
 
 - Node.js 18+
 - npm
 
-## Установка
+## Установка и запуск
 
 ```bash
 npm install
-```
-
-## Запуск
-
-```bash
-# dev-сервер (http://localhost:5173)
-npm start
-
-# или
-npm run dev
-```
-
-## Сборка
-
-```bash
-# production-сборка в папку dist/
+npm start          # http://localhost:5173
+npm run typecheck
 npm run build
-
-# просмотр production-сборки
-npm run preview
 ```
 
-## Структура проекта
+## Интерфейс
+
+- **Pixi.js** — исходная сцена (демо из ТЗ + случайные фигуры)
+- **Skia** — тот же `PIXI.Container`, отрисованный через `PixiToSkiaRenderer`
+- **ControlPanel**
+  - «Экспорт в PDF» — заглушка (будет на следующем этапе)
+  - «Сгенерировать случайную линию / фигуру»
+
+## Архитектура
 
 ```
-├── index.html          # точка входа HTML
-├── src/
-│   ├── main.js         # инициализация Pixi.js и CanvasKit
-│   └── style.css       # базовые стили
-├── vite.config.js      # конфигурация Vite (поддержка .wasm)
-└── package.json
+src/
+├── skia/
+│   ├── types.ts              # ISkiaRenderer
+│   └── pixiToSkiaRenderer.ts # Pixi Container → Skia canvas
+├── scene/
+│   ├── demoScene.ts          # псевдокод из ТЗ
+│   └── randomShape.ts
+└── app/App.ts
 ```
 
-## Что на странице
+### `ISkiaRenderer` / `PixiToSkiaRenderer`
 
-На главной странице два canvas:
-
-- **Pixi.js** — оранжевый круг, нарисованный через WebGL
-- **Skia (CanvasKit)** — зелёный круг, нарисованный через Skia WASM
+- На вход: `PIXI.Container`
+- Рекурсивный обход `DisplayObject` с `translate` / `rotate` / `scale` (через `localTransform`)
+- **Graphics**: `fill` / `stroke` из `graphics.context.instructions` → SVG path (`buildSVGPath`) → `SkPath`
+- **Sprite**: PNG через `MakeImageFromCanvasImageSource`
 
 ## Лицензия
 

@@ -14,17 +14,47 @@ h1 {
   margin-top: 0;
 }
 
-.panels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-}
-
-section h2 {
+h2 {
   margin: 0 0 12px;
   font-size: 1rem;
   font-weight: 600;
   color: #aaa;
+}
+
+.control-panel {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #252540;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.control-panel h2 {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.control-panel button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #6c5ce7;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.control-panel button:hover {
+  background: #5b4cdb;
+}
+
+.panels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
 }
 
 canvas {

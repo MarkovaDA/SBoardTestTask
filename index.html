@@ -7,6 +7,13 @@
 </head>
 <body>
   <h1>SBoard Test Task</h1>
+
+  <aside class="control-panel">
+    <h2>ControlPanel</h2>
+    <button type="button" id="btn-export-pdf" disabled>Экспорт в PDF</button>
+    <button type="button" id="btn-random-shape" disabled>Сгенерировать случайную линию / фигуру</button>
+  </aside>
+
   <div class="panels">
     <section>
       <h2>Pixi.js</h2>
@@ -17,6 +24,7 @@
       <canvas id="skia-canvas" width="400" height="300"></canvas>
     </section>
   </div>
+
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
