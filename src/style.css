@@ -71,3 +71,12 @@ h2 {
   height: auto;
   border-radius: 8px;
 }
+
+/* Interaction (drag) only on the Pixi canvas; Skia is a preview. */
+#skia-canvas {
+  pointer-events: none;
+}
+
+#pixi-container canvas {
+  cursor: default;
+}

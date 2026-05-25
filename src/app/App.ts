@@ -4,6 +4,8 @@ import { loadCanvasKit, PixiToSkiaRenderer } from '../skia/pixi';
 import type { SkiaPdfExporter } from '../skia/pdf';
 import type { SkiaRendererOptions } from '../skia/types';
 import { createDemoScene } from '../scene/demoScene';
+import { commitPendingStrokes } from '../skia/pixi/commitPendingStrokes';
+import { enableDrag, enableDragOnDescendants } from '../scene/drag';
 import { addRandomShape } from '../scene/randomShape';
 
 const SCENE_BACKGROUND = '#2d2d44';
@@ -41,6 +43,7 @@ export class App {
     if (!pixiContainer || !(skiaCanvas instanceof HTMLCanvasElement)) {
       throw new Error('Required DOM elements not found');
     }
+
     if (!(exportBtn instanceof HTMLButtonElement) || !(randomBtn instanceof HTMLButtonElement)) {
       throw new Error('Control panel buttons not found');
     }
@@ -53,30 +56,44 @@ export class App {
     };
 
     const pixiApp = new Application();
+
     await pixiApp.init({
       width: renderOptions.width,
       height: renderOptions.height,
       background: SCENE_BACKGROUND,
       resolution: 1,
     });
+
     pixiContainer.appendChild(pixiApp.canvas);
 
     const sceneRoot = createDemoScene();
+    pixiApp.stage.eventMode = 'static';
     pixiApp.stage.addChild(sceneRoot);
 
     const skiaRenderer = new PixiToSkiaRenderer(canvasKit, renderOptions);
     const app = new App(pixiApp, sceneRoot, skiaRenderer, skiaCanvas, renderOptions);
 
+    app.setupDragging();
+
     exportBtn.addEventListener('click', () => {
       void app.exportPdf();
     });
+
     randomBtn.addEventListener('click', () => {
       app.addRandomShape();
     });
 
     app.applyCanvasSize();
+    
     window.addEventListener('resize', () => app.applyCanvasSize());
     return app;
+  }
+
+  private setupDragging(): void {
+    const { stage } = this._pixiApp;
+
+    commitPendingStrokes(this.sceneRoot);
+    enableDragOnDescendants(this.sceneRoot, stage, () => this.syncSkiaPreview());
   }
 
   private applyCanvasSize(): void {
@@ -99,7 +116,9 @@ export class App {
   }
 
   private addRandomShape(): void {
-    addRandomShape(this.sceneRoot);
+    const shape = addRandomShape(this.sceneRoot);
+    commitPendingStrokes(shape);
+    enableDrag(shape, this._pixiApp.stage, () => this.syncSkiaPreview());
     this.syncSkiaPreview();
   }
 
