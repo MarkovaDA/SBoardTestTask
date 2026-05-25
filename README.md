@@ -26,7 +26,7 @@ npm run build
 ## Интерфейс
 
 - **Pixi.js** — исходная сцена (демо из ТЗ + случайные фигуры)
-- **Skia** — тот же `PIXI.Container` через `PixiToSkiaRenderer`
+- **Skia** — тот же `PIXI.Container` через `convertPixiContainerToSkia()`
 - **ControlPanel**
   - «Экспорт в PDF» — векторный PDF через `MakePDFDocument` / `beginPage` / `close`
   - «Сгенерировать случайную линию / фигуру»

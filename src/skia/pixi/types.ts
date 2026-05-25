@@ -7,7 +7,7 @@ export type { Container as PixiContainer };
 export interface ISkiaRenderer {
   readonly canvasKit: CanvasKit;
   /** `container` must be on a stage with up-to-date transforms. */
-  render(container: Container, target: SkiaRenderTarget): void;
+  convertPixiContainerToSkia(container: Container, skiaCanvas: HTMLCanvasElement): void;
 }
 
 export type SkiaRenderTarget =

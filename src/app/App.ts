@@ -1,6 +1,6 @@
 import { Application, Container } from 'pixi.js';
 import { getViewportCanvasSize } from './canvasLayout';
-import { loadCanvasKit, PixiToSkiaRenderer } from '../skia/pixi';
+import { convertPixiContainerToSkia, loadCanvasKit, PixiToSkiaRenderer } from '../skia/pixi';
 import type { SkiaPdfExporter } from '../skia/pdf';
 import type { SkiaRendererOptions } from '../skia/types';
 import { createDemoScene } from '../scene/demoScene';
@@ -92,10 +92,7 @@ export class App {
 
   private syncSkiaPreview(): void {
     this._pixiApp.render();
-    this.skiaRenderer.render(this._pixiApp.stage, {
-      kind: 'html-canvas',
-      canvas: this.skiaCanvas,
-    });
+    convertPixiContainerToSkia(this._pixiApp.stage, this.skiaCanvas, this.skiaRenderer);
   }
 
   private addRandomShape(): void {

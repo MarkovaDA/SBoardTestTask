@@ -20,7 +20,11 @@ export class PixiToSkiaRenderer implements ISkiaRenderer {
     return this.drawer;
   }
 
-  render(container: Container, target: SkiaRenderTarget): void {
+  convertPixiContainerToSkia(container: Container, skiaCanvas: HTMLCanvasElement): void {
+    this.render(container, { kind: 'html-canvas', canvas: skiaCanvas });
+  }
+
+  private render(container: Container, target: SkiaRenderTarget): void {
     commitPendingStrokes(container);
 
     const surface = this.resolveSurface(target);
