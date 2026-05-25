@@ -1,4 +1,5 @@
 import type { CanvasKit, Surface } from 'canvaskit-wasm';
+
 import type { Container } from 'pixi.js';
 
 export type { Container as PixiContainer };

@@ -1,33 +1,44 @@
 import type { CanvasKit, PDFMetadata } from '@rollerbird/canvaskit-wasm-pdf';
 import type { Container } from 'pixi.js';
-import type { SkiaCanvasApi, SkiaCanvasKitApi } from '../types';
-import { commitPendingStrokes } from '../pixi/commitPendingStrokes';
+
+import type { SkiaCanvasApi, SkiaCanvasKitApi, SkiaRendererOptions } from '../../types';
+
+import { PendingStrokeCommitter } from '../pixi/commitPendingStrokes';
 import { PixiSceneDrawer } from '../pixi/pixiSceneDrawer';
-import type { SkiaRendererOptions } from '../types';
-import { loadCanvasKitPdf } from './loadCanvasKitPdf';
+
+import { CanvasKitPdfLoader } from './loadCanvasKitPdf';
+import {
+  PDF_METADATA_AUTHOR,
+  PDF_METADATA_CREATOR,
+  PDF_METADATA_PRODUCER,
+  PDF_METADATA_TITLE,
+  PDF_RASTER_DPI,
+} from './constants';
 
 export class SkiaPdfExporter {
+  private readonly strokeCommitter = new PendingStrokeCommitter();
+
   private constructor(
     private readonly canvasKit: CanvasKit,
     private readonly options: SkiaRendererOptions,
   ) {}
 
   static async create(options: SkiaRendererOptions): Promise<SkiaPdfExporter> {
-    const canvasKit = await loadCanvasKitPdf();
+    const canvasKit = await new CanvasKitPdfLoader().load();
     return new SkiaPdfExporter(canvasKit, options);
   }
 
   export(container: Container): Uint8Array {
-    commitPendingStrokes(container);
+    this.strokeCommitter.commit(container);
 
     const { width, height } = this.options;
 
     const metadata = {
-      title: 'SBoard Export',
-      author: 'SBoard Test Task',
-      creator: 'SBoard Test Task',
-      producer: 'Skia PDF',
-      rasterDPI: 72,
+      title: PDF_METADATA_TITLE,
+      author: PDF_METADATA_AUTHOR,
+      creator: PDF_METADATA_CREATOR,
+      producer: PDF_METADATA_PRODUCER,
+      rasterDPI: PDF_RASTER_DPI,
       compressionLevel: this.canvasKit.PDFCompressionLevel.Default,
       _rootTag: null,
     } as PDFMetadata & { _rootTag: null };

@@ -1,116 +1,152 @@
-// TODO: можно использовать pixi/draggable или pixi/interaction 
-// TODO: перейти на классовый подход
 import { Container, Rectangle, type FederatedPointerEvent } from 'pixi.js';
 
-const HIT_PADDING = 12;
+import type { DragChangeCallback } from '../types';
 
-export type DragChangeCallback = () => void;
-
-function ensureHitArea(target: Container): void {
-  const bounds = target.getLocalBounds();
-
-  if (bounds.width <= 0 && bounds.height <= 0) {
-    return;
-  }
-
-  target.hitArea = new Rectangle(
-    bounds.x - HIT_PADDING,
-    bounds.y - HIT_PADDING,
-    bounds.width + HIT_PADDING * 2,
-    bounds.height + HIT_PADDING * 2,
-  );
-}
+import { DRAG_HIT_PADDING } from './constants';
 
 /**
  * Drag with the mouse on the Pixi canvas only (`stage` receives move/up while dragging).
  */
-export function enableDrag(
-  target: Container,
-  stage: Container,
-  onChange?: DragChangeCallback,
-): void {
-  ensureHitArea(target);
+export class Draggable {
+  private readonly target: Container;
+  private readonly stage: Container;
+  private readonly onChange?: DragChangeCallback;
 
-  target.eventMode = 'static';
-  target.cursor = 'pointer';
+  private dragging = false;
+  private offsetX = 0;
+  private offsetY = 0;
+  private syncScheduled = false;
 
-  let dragging = false;
-  let offsetX = 0;
-  let offsetY = 0;
-  let syncScheduled = false;
+  constructor(target: Container, stage: Container, onChange?: DragChangeCallback) {
+    this.target = target;
+    this.stage = stage;
+    this.onChange = onChange;
+    this.attach();
+  }
 
-  const scheduleChange = (): void => {
-    if (!onChange || syncScheduled) {
+  destroy(): void {
+    this.endDrag();
+    this.target.off('pointerdown', this.onPointerDown);
+    this.target.eventMode = 'auto';
+    this.target.cursor = 'default';
+    this.target.hitArea = null;
+  }
+
+  private static ensureHitArea(target: Container): void {
+    const bounds = target.getLocalBounds();
+
+    if (bounds.width <= 0 && bounds.height <= 0) {
       return;
     }
-    
-    syncScheduled = true;
+
+    target.hitArea = new Rectangle(
+      bounds.x - DRAG_HIT_PADDING,
+      bounds.y - DRAG_HIT_PADDING,
+      bounds.width + DRAG_HIT_PADDING * 2,
+      bounds.height + DRAG_HIT_PADDING * 2,
+    );
+  }
+
+  private attach(): void {
+    Draggable.ensureHitArea(this.target);
+    this.target.eventMode = 'static';
+    this.target.cursor = 'pointer';
+    this.target.on('pointerdown', this.onPointerDown);
+  }
+
+  private scheduleChange(): void {
+    if (!this.onChange || this.syncScheduled) {
+      return;
+    }
+
+    this.syncScheduled = true;
 
     requestAnimationFrame(() => {
-      syncScheduled = false;
-      onChange();
+      this.syncScheduled = false;
+      this.onChange?.();
     });
-  };
+  }
 
-  const onDragMove = (event: FederatedPointerEvent): void => {
-    if (!dragging) {
+  private readonly onDragMove = (event: FederatedPointerEvent): void => {
+    if (!this.dragging) {
       return;
     }
 
-    const parent = target.parent;
+    const parent = this.target.parent;
 
     if (!parent) {
       return;
     }
 
     const local = event.getLocalPosition(parent);
-    target.position.set(local.x + offsetX, local.y + offsetY);
-    scheduleChange();
+    this.target.position.set(local.x + this.offsetX, local.y + this.offsetY);
+    this.scheduleChange();
   };
 
-  const endDrag = (): void => {
-    if (!dragging) {
+  private readonly endDrag = (): void => {
+    if (!this.dragging) {
       return;
     }
 
-    dragging = false;
-    target.cursor = 'pointer';
-    stage.off('pointermove', onDragMove);
-    stage.off('pointerup', endDrag);
-    stage.off('pointerupoutside', endDrag);
-    scheduleChange();
+    this.dragging = false;
+    this.target.cursor = 'pointer';
+    this.stage.off('pointermove', this.onDragMove);
+    this.stage.off('pointerup', this.endDrag);
+    this.stage.off('pointerupoutside', this.endDrag);
+    this.scheduleChange();
   };
 
-  target.on('pointerdown', (event: FederatedPointerEvent) => {
-    const parent = target.parent;
+  private readonly onPointerDown = (event: FederatedPointerEvent): void => {
+    const parent = this.target.parent;
+
     if (!parent) {
       return;
     }
 
-    dragging = true;
-    target.cursor = 'grabbing';
+    this.dragging = true;
+    this.target.cursor = 'grabbing';
     const local = event.getLocalPosition(parent);
-    offsetX = target.x - local.x;
-    offsetY = target.y - local.y;
+    this.offsetX = this.target.x - local.x;
+    this.offsetY = this.target.y - local.y;
     event.stopPropagation();
 
-    stage.on('pointermove', onDragMove);
-    stage.on('pointerup', endDrag);
-    stage.on('pointerupoutside', endDrag);
-  });
+    this.stage.on('pointermove', this.onDragMove);
+    this.stage.on('pointerup', this.endDrag);
+    this.stage.on('pointerupoutside', this.endDrag);
+  };
 }
 
-/** Enables drag on all descendants of `root` (not on `root` itself). */
-export function enableDragOnDescendants(
-  root: Container,
-  stage: Container,
-  onChange?: DragChangeCallback,
-): void {
-  for (const child of root.children) {
-    enableDrag(child, stage, onChange);
+/** Enables drag on scene objects and tracks active handlers. */
+export class DragController {
+  private readonly stage: Container;
+  private readonly onChange?: DragChangeCallback;
+  private readonly draggables: Draggable[] = [];
 
-    if (child instanceof Container && child.children.length > 0) {
-      enableDragOnDescendants(child, stage, onChange);
+  constructor(stage: Container, onChange?: DragChangeCallback) {
+    this.stage = stage;
+    this.onChange = onChange;
+  }
+
+  enableOn(target: Container): Draggable {
+    const draggable = new Draggable(target, this.stage, this.onChange);
+    this.draggables.push(draggable);
+    return draggable;
+  }
+
+  enableOnDescendants(root: Container): void {
+    for (const child of root.children) {
+      this.enableOn(child);
+
+      if (child instanceof Container && child.children.length > 0) {
+        this.enableOnDescendants(child);
+      }
     }
+  }
+
+  clear(): void {
+    for (const draggable of this.draggables) {
+      draggable.destroy();
+    }
+    this.draggables.length = 0;
   }
 }

@@ -1,5 +1,3 @@
-import type { SkiaCanvasApi, SkiaCanvasKitApi, SkiaPathApi } from '../types';
-import type { SkiaRendererOptions } from '../types';
 import {
   buildSVGPath,
   Container,
@@ -9,23 +7,33 @@ import {
   type ConvertedStrokeStyle,
   type GraphicsInstructions,
 } from 'pixi.js';
-import { applyFillPaint, applyStrokePaint } from './color';
-import { clearCanvas, concatGroupTransform } from './matrix';
+
+import type { SkiaCanvasApi, SkiaCanvasKitApi, SkiaPathApi, SkiaRendererOptions } from '../../types';
+
+import { DEFAULT_CANVAS_BACKGROUND, SVG_PATH_PRECISION } from './constants';
+import { SkiaPaintStyles } from './color';
+import { SkiaCanvasTransform } from './matrix';
 
 type FillInstruction = Extract<GraphicsInstructions, { action: 'fill' | 'cut' }>;
 type StrokeInstruction = Extract<GraphicsInstructions, { action: 'stroke' }>;
 
 /** Draws a Pixi container tree onto any Skia canvas (preview, PDF page, etc.). */
 export class PixiSceneDrawer {
+  private readonly canvasTransform: SkiaCanvasTransform;
+  private readonly paintStyles: SkiaPaintStyles;
+
   constructor(
     private readonly canvasKit: SkiaCanvasKitApi,
     private readonly options: SkiaRendererOptions,
-  ) {}
+  ) {
+    this.canvasTransform = new SkiaCanvasTransform(canvasKit);
+    this.paintStyles = new SkiaPaintStyles(canvasKit);
+  }
 
   draw(container: Container, canvas: SkiaCanvasApi): void {
-    const { width, height, background = '#ffffff' } = this.options;
+    const { width, height, background = DEFAULT_CANVAS_BACKGROUND } = this.options;
 
-    clearCanvas(this.canvasKit, canvas, width, height, background);
+    this.canvasTransform.clearCanvas(canvas, width, height, background);
 
     let root: Container | null = container;
     while (root.parent) {
@@ -44,7 +52,7 @@ export class PixiSceneDrawer {
     const alpha = node.groupAlpha;
 
     canvas.save();
-    concatGroupTransform(canvas, node);
+    this.canvasTransform.concatGroupTransform(canvas, node);
 
     if (node instanceof Graphics) {
       this.renderGraphics(canvas, node, alpha);
@@ -78,7 +86,7 @@ export class PixiSceneDrawer {
     }
 
     const paint = new this.canvasKit.Paint();
-    applyFillPaint(this.canvasKit, paint, instruction.data.style.color, instruction.data.style.alpha * alpha);
+    this.paintStyles.applyFillPaint(paint, instruction.data.style.color, instruction.data.style.alpha * alpha);
     canvas.drawPath(path, paint);
     paint.delete();
     path.delete();
@@ -93,7 +101,7 @@ export class PixiSceneDrawer {
     const style = instruction.data.style as ConvertedStrokeStyle;
     const paint = new this.canvasKit.Paint();
 
-    applyStrokePaint(this.canvasKit, paint, style.color, style.alpha * alpha, style);
+    this.paintStyles.applyStrokePaint(paint, style.color, style.alpha * alpha, style);
 
     canvas.drawPath(path, paint);
     paint.delete();
@@ -101,7 +109,7 @@ export class PixiSceneDrawer {
   }
 
   private buildSkPath(graphicsPath: FillInstruction['data']['path']): SkiaPathApi | null {
-    const svgPath = buildSVGPath(graphicsPath, 2);
+    const svgPath = buildSVGPath(graphicsPath, SVG_PATH_PRECISION);
     if (!svgPath) {
       return null;
     }

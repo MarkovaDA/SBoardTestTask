@@ -1,13 +1,20 @@
 import type { CanvasKit, Surface } from 'canvaskit-wasm';
 import type { Container } from 'pixi.js';
-import type { SkiaCanvasApi, SkiaCanvasKitApi } from '../types';
-import type { SkiaRendererOptions } from '../types';
-import { commitPendingStrokes } from './commitPendingStrokes';
+
+import type {
+  ISkiaRenderer,
+  SkiaCanvasApi,
+  SkiaCanvasKitApi,
+  SkiaRendererOptions,
+  SkiaRenderTarget,
+} from '../../types';
+
+import { PendingStrokeCommitter } from './commitPendingStrokes';
 import { PixiSceneDrawer } from './pixiSceneDrawer';
-import type { ISkiaRenderer, SkiaRenderTarget } from './types';
 
 export class PixiToSkiaRenderer implements ISkiaRenderer {
   private readonly drawer: PixiSceneDrawer;
+  private readonly strokeCommitter = new PendingStrokeCommitter();
 
   constructor(
     readonly canvasKit: CanvasKit,
@@ -21,7 +28,7 @@ export class PixiToSkiaRenderer implements ISkiaRenderer {
   }
 
   render(container: Container, target: SkiaRenderTarget): void {
-    commitPendingStrokes(container);
+    this.strokeCommitter.commit(container);
 
     const surface = this.resolveSurface(target);
     const canvas = surface.getCanvas();

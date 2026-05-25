@@ -1,10 +1,13 @@
 import './style.css';
+
 import { App } from './app/App';
 
-async function main(): Promise<void> {
-  await App.create();
+class ApplicationEntry {
+  async run(): Promise<void> {
+    await App.create();
+  }
 }
 
-main().catch((error: unknown) => {
+new ApplicationEntry().run().catch((error: unknown) => {
   console.error(error);
 });
