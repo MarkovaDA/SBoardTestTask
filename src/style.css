@@ -53,11 +53,21 @@ h2 {
 
 .panels {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 24px;
+  width: 100%;
 }
 
-canvas {
+.panels > section {
+  flex: 1 1 50%;
+  min-width: 0;
+  max-width: 50%;
+}
+
+.panels canvas,
+#pixi-container canvas {
   display: block;
+  width: 100%;
+  height: auto;
   border-radius: 8px;
 }

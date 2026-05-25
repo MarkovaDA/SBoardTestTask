@@ -1,3 +1,11 @@
-export type { ISkiaRenderer, SkiaRenderTarget, SkiaRendererOptions } from './types';
-export { loadCanvasKit } from './loadCanvasKit';
-export { PixiToSkiaRenderer } from './pixiToSkiaRenderer';
+export type {
+  SkiaRendererOptions,
+  SkiaCanvasKitApi,
+  SkiaPaintApi,
+  SkiaPathApi,
+  SkiaImageApi,
+  SkiaCanvasApi,
+} from './types';
+
+export * as pixi from './pixi';
+export * as pdf from './pdf';

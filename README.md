@@ -1,11 +1,12 @@
 # SBoard Test Task
 
-Веб-приложение на TypeScript: Pixi.js + Skia (CanvasKit), обёртка рендера Pixi-контейнера в Skia.
+Веб-приложение на TypeScript: Pixi.js + Skia (CanvasKit), обёртка рендера Pixi-контейнера в Skia и **векторный** экспорт в PDF через Skia PDF backend.
 
 ## Стек
 
 - [Pixi.js](https://pixijs.com/) — интерактивная сцена (WebGL)
-- [canvaskit-wasm](https://www.npmjs.com/package/canvaskit-wasm) — Skia в браузере
+- [canvaskit-wasm](https://www.npmjs.com/package/canvaskit-wasm) — превью Skia в браузере
+- [@rollerbird/canvaskit-wasm-pdf](deps/rollerbird-canvaskit-wasm-pdf-0.1.3.tgz) — CanvasKit со `skia_enable_pdf=true`
 - [Vite](https://vite.dev/) + TypeScript
 
 ## Требования
@@ -25,30 +26,27 @@ npm run build
 ## Интерфейс
 
 - **Pixi.js** — исходная сцена (демо из ТЗ + случайные фигуры)
-- **Skia** — тот же `PIXI.Container`, отрисованный через `PixiToSkiaRenderer`
+- **Skia** — тот же `PIXI.Container` через `PixiToSkiaRenderer`
 - **ControlPanel**
-  - «Экспорт в PDF» — заглушка (будет на следующем этапе)
+  - «Экспорт в PDF» — векторный PDF через `MakePDFDocument` / `beginPage` / `close`
   - «Сгенерировать случайную линию / фигуру»
 
 ## Архитектура
 
 ```
-src/
-├── skia/
-│   ├── types.ts              # ISkiaRenderer
-│   └── pixiToSkiaRenderer.ts # Pixi Container → Skia canvas
-├── scene/
-│   ├── demoScene.ts          # псевдокод из ТЗ
-│   └── randomShape.ts
-└── app/App.ts
+src/skia/
+├── types.ts                 # общие типы (опции рендера + CanvasKit API)
+├── pixi/                    # Pixi.js → Skia
+│   ├── types.ts             # ISkiaRenderer, SkiaRenderTarget
+│   └── ...
+└── pdf/                     # экспорт в PDF
 ```
 
-### `ISkiaRenderer` / `PixiToSkiaRenderer`
+Экспорт рисует те же примитивы, что и превью (`drawPath`, заливки, линии) — **не** растровая вставка в PDF.
 
-- На вход: `PIXI.Container`
-- Рекурсивный обход `DisplayObject` с `translate` / `rotate` / `scale` (через `localTransform`)
-- **Graphics**: `fill` / `stroke` из `graphics.context.instructions` → SVG path (`buildSVGPath`) → `SkPath`
-- **Sprite**: PNG через `MakeImageFromCanvasImageSource`
+## Пересборка WASM с PDF
+
+См. [scripts/build-canvaskit-pdf.md](scripts/build-canvaskit-pdf.md) и `scripts/build-canvaskit-pdf.sh` (Linux/WSL, `skia_enable_pdf=true`).
 
 ## Лицензия
 
