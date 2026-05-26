@@ -1,66 +1,61 @@
-import type { SkiaCanvasKitApi, SkiaPaintApi } from '../types';
 import type { ColorSource, ConvertedStrokeStyle } from 'pixi.js';
 import { Color } from 'pixi.js';
 
-export function toSkiaColor(
-  canvasKit: SkiaCanvasKitApi,
-  color: ColorSource,
-  alpha: number,
-): Float32Array | number[] {
-  const parsed = Color.shared.setValue(color);
-  const a = (parsed.alpha ?? 1) * alpha;
-  return canvasKit.Color(
-    Math.round(parsed.red * 255),
-    Math.round(parsed.green * 255),
-    Math.round(parsed.blue * 255),
-    a,
-  );
-}
+import type { SkiaCanvasKitApi, SkiaPaintApi } from '../../types';
 
-export function applyFillPaint(
-  canvasKit: SkiaCanvasKitApi,
-  paint: SkiaPaintApi,
-  color: ColorSource,
-  alpha: number,
-): void {
-  paint.setColor(toSkiaColor(canvasKit, color, alpha));
-  paint.setStyle(canvasKit.PaintStyle.Fill as number);
-  paint.setAntiAlias(true);
-}
+export class SkiaPaintStyles {
+  constructor(private readonly canvasKit: SkiaCanvasKitApi) {}
 
-export function applyStrokePaint(
-  canvasKit: SkiaCanvasKitApi,
-  paint: SkiaPaintApi,
-  color: ColorSource,
-  alpha: number,
-  style: Pick<ConvertedStrokeStyle, 'width' | 'cap' | 'join'>,
-): void {
-  paint.setColor(toSkiaColor(canvasKit, color, alpha));
-  paint.setStyle(canvasKit.PaintStyle.Stroke as number);
-  paint.setStrokeWidth(style.width ?? 1);
-  paint.setStrokeCap(toSkiaStrokeCap(canvasKit, style.cap));
-  paint.setStrokeJoin(toSkiaStrokeJoin(canvasKit, style.join));
-  paint.setAntiAlias(true);
-}
-
-function toSkiaStrokeCap(canvasKit: SkiaCanvasKitApi, cap: ConvertedStrokeStyle['cap']): unknown {
-  switch (cap) {
-    case 'round':
-      return canvasKit.StrokeCap.Round;
-    case 'square':
-      return canvasKit.StrokeCap.Square;
-    default:
-      return canvasKit.StrokeCap.Butt;
+  toSkiaColor(color: ColorSource, alpha: number): Float32Array | number[] {
+    const parsed = Color.shared.setValue(color);
+    const a = (parsed.alpha ?? 1) * alpha;
+    return this.canvasKit.Color(
+      Math.round(parsed.red * 255),
+      Math.round(parsed.green * 255),
+      Math.round(parsed.blue * 255),
+      a,
+    );
   }
-}
 
-function toSkiaStrokeJoin(canvasKit: SkiaCanvasKitApi, join: ConvertedStrokeStyle['join']): unknown {
-  switch (join) {
-    case 'round':
-      return canvasKit.StrokeJoin.Round;
-    case 'bevel':
-      return canvasKit.StrokeJoin.Bevel;
-    default:
-      return canvasKit.StrokeJoin.Miter;
+  applyFillPaint(paint: SkiaPaintApi, color: ColorSource, alpha: number): void {
+    paint.setColor(this.toSkiaColor(color, alpha));
+    paint.setStyle(this.canvasKit.PaintStyle.Fill as number);
+    paint.setAntiAlias(true);
+  }
+
+  applyStrokePaint(
+    paint: SkiaPaintApi,
+    color: ColorSource,
+    alpha: number,
+    style: Pick<ConvertedStrokeStyle, 'width' | 'cap' | 'join'>,
+  ): void {
+    paint.setColor(this.toSkiaColor(color, alpha));
+    paint.setStyle(this.canvasKit.PaintStyle.Stroke as number);
+    paint.setStrokeWidth(style.width ?? 1);
+    paint.setStrokeCap(this.toSkiaStrokeCap(style.cap));
+    paint.setStrokeJoin(this.toSkiaStrokeJoin(style.join));
+    paint.setAntiAlias(true);
+  }
+
+  private toSkiaStrokeCap(cap: ConvertedStrokeStyle['cap']): unknown {
+    switch (cap) {
+      case 'round':
+        return this.canvasKit.StrokeCap.Round;
+      case 'square':
+        return this.canvasKit.StrokeCap.Square;
+      default:
+        return this.canvasKit.StrokeCap.Butt;
+    }
+  }
+
+  private toSkiaStrokeJoin(join: ConvertedStrokeStyle['join']): unknown {
+    switch (join) {
+      case 'round':
+        return this.canvasKit.StrokeJoin.Round;
+      case 'bevel':
+        return this.canvasKit.StrokeJoin.Bevel;
+      default:
+        return this.canvasKit.StrokeJoin.Miter;
+    }
   }
 }
