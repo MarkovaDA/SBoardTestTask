@@ -9,8 +9,8 @@ import type {
   SkiaRenderTarget,
 } from '../../types';
 
-import { PendingStrokeCommitter } from './commitPendingStrokes';
-import { PixiSceneDrawer } from './pixiSceneDrawer';
+import { PendingStrokeCommitter } from './strokeCommitter';
+import { PixiSceneDrawer } from './sceneDrawer';
 
 export class PixiToSkiaRenderer implements ISkiaRenderer {
   private readonly drawer: PixiSceneDrawer;

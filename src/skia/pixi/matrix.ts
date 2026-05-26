@@ -2,7 +2,7 @@ import type { Container, Matrix } from 'pixi.js';
 
 import type { SkiaCanvasApi, SkiaCanvasKitApi } from '../../types';
 
-export class SkiaCanvasTransform {
+export class SkiaCanvasTransformer {
   constructor(private readonly canvasKit: SkiaCanvasKitApi) {}
 
   /** Pixi 2D affine matrix → CanvasKit 3×3 (row-major). */

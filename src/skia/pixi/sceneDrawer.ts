@@ -12,21 +12,21 @@ import type { SkiaCanvasApi, SkiaCanvasKitApi, SkiaPathApi, SkiaRendererOptions 
 
 import { DEFAULT_CANVAS_BACKGROUND, SVG_PATH_PRECISION } from './constants';
 import { SkiaPaintStyles } from './color';
-import { SkiaCanvasTransform } from './matrix';
+import { SkiaCanvasTransformer } from './matrix';
 
 type FillInstruction = Extract<GraphicsInstructions, { action: 'fill' | 'cut' }>;
 type StrokeInstruction = Extract<GraphicsInstructions, { action: 'stroke' }>;
 
 /** Draws a Pixi container tree onto any Skia canvas (preview, PDF page, etc.). */
 export class PixiSceneDrawer {
-  private readonly canvasTransform: SkiaCanvasTransform;
+  private readonly canvasTransform: SkiaCanvasTransformer;
   private readonly paintStyles: SkiaPaintStyles;
 
   constructor(
     private readonly canvasKit: SkiaCanvasKitApi,
     private readonly options: SkiaRendererOptions,
   ) {
-    this.canvasTransform = new SkiaCanvasTransform(canvasKit);
+    this.canvasTransform = new SkiaCanvasTransformer(canvasKit);
     this.paintStyles = new SkiaPaintStyles(canvasKit);
   }
 
@@ -39,6 +39,7 @@ export class PixiSceneDrawer {
     while (root.parent) {
       root = root.parent;
     }
+
     root.updateTransform({});
 
     this.walkScene(canvas, container);
@@ -81,6 +82,7 @@ export class PixiSceneDrawer {
 
   private drawFill(canvas: SkiaCanvasApi, instruction: FillInstruction, alpha: number): void {
     const path = this.buildSkPath(instruction.data.path);
+    
     if (!path) {
       return;
     }
@@ -94,6 +96,7 @@ export class PixiSceneDrawer {
 
   private drawStroke(canvas: SkiaCanvasApi, instruction: StrokeInstruction, alpha: number): void {
     const path = this.buildSkPath(instruction.data.path);
+    
     if (!path) {
       return;
     }
@@ -110,9 +113,11 @@ export class PixiSceneDrawer {
 
   private buildSkPath(graphicsPath: FillInstruction['data']['path']): SkiaPathApi | null {
     const svgPath = buildSVGPath(graphicsPath, SVG_PATH_PRECISION);
+    
     if (!svgPath) {
       return null;
     }
+
     return this.canvasKit.Path.MakeFromSVGString(svgPath);
   }
 
@@ -149,6 +154,7 @@ export class PixiSceneDrawer {
       frame.x + frame.width,
       frame.y + frame.height,
     ];
+
     const dest: [number, number, number, number] = [
       -anchorX,
       -anchorY,

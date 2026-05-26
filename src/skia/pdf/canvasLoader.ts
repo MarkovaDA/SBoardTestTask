@@ -16,6 +16,7 @@ export class CanvasKitPdfLoader {
         return ck;
       });
     }
+    
     return CanvasKitPdfLoader.canvasKitPdfPromise;
   }
 }

@@ -24,6 +24,7 @@ export class PendingStrokeCommitter {
       strokeStyle: { width?: number };
       stroke(): void;
     };
+    
     const activePath = ctx._activePath;
 
     if (!this.hasDrawablePath(activePath)) {
@@ -31,6 +32,7 @@ export class PendingStrokeCommitter {
     }
 
     const width = ctx.strokeStyle.width ?? 0;
+    
     if (width <= 0) {
       return;
     }

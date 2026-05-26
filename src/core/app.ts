@@ -4,10 +4,10 @@ import type { SkiaRendererOptions } from '../types';
 import type { SkiaPdfExporter } from '../skia/pdf';
 
 import { CanvasKitLoader, PixiToSkiaRenderer } from '../skia/pixi';
-import { PendingStrokeCommitter } from '../skia/pixi/commitPendingStrokes';
+import { PendingStrokeCommitter } from '../skia/pixi/strokeCommitter';
 
 import { DemoScene } from '../scene/demoScene';
-import { DragController } from '../scene/drag';
+import { DragController } from '../scene/draggable';
 import { RandomShapeFactory } from '../scene/randomShape';
 
 import { CanvasLayout } from './layout';

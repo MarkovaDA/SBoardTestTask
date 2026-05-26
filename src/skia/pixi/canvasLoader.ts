@@ -11,6 +11,7 @@ export class CanvasKitLoader {
         locateFile: () => canvaskitWasm,
       });
     }
+    
     return CanvasKitLoader.canvasKitPromise;
   }
 }

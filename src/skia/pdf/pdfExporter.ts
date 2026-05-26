@@ -3,10 +3,10 @@ import type { Container } from 'pixi.js';
 
 import type { SkiaCanvasApi, SkiaCanvasKitApi, SkiaRendererOptions } from '../../types';
 
-import { PendingStrokeCommitter } from '../pixi/commitPendingStrokes';
-import { PixiSceneDrawer } from '../pixi/pixiSceneDrawer';
+import { PendingStrokeCommitter } from '../pixi/strokeCommitter';
+import { PixiSceneDrawer } from '../pixi/sceneDrawer';
 
-import { CanvasKitPdfLoader } from './loadCanvasKitPdf';
+import { CanvasKitPdfLoader } from './canvasLoader';
 import {
   PDF_METADATA_AUTHOR,
   PDF_METADATA_CREATOR,
