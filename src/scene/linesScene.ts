@@ -15,28 +15,28 @@ export class LinesScene {
 
     const lineA = new Graphics();
     lineA
-      .lineStyle(LINES_SCENE_LINE_WIDTH, LINES_SCENE_STROKE_A, 1)
       .moveTo(60, 80)
-      .lineTo(320, 120);
+      .lineTo(320, 120)
+      .stroke({ width: LINES_SCENE_LINE_WIDTH, color: LINES_SCENE_STROKE_A, alpha: 1 });
 
     const lineB = new Graphics();
     lineB
-      .lineStyle(LINES_SCENE_LINE_WIDTH, LINES_SCENE_STROKE_B, 1)
       .moveTo(100, 220)
-      .lineTo(380, 60);
+      .lineTo(380, 60)
+      .stroke({ width: LINES_SCENE_LINE_WIDTH, color: LINES_SCENE_STROKE_B, alpha: 1 });
 
     const lineC = new Graphics();
     lineC
-      .lineStyle(LINES_SCENE_LINE_WIDTH + 2, LINES_SCENE_STROKE_C, 1)
       .moveTo(200, 40)
-      .lineTo(200, 260);
+      .lineTo(200, 260)
+      .stroke({ width: LINES_SCENE_LINE_WIDTH + 2, color: LINES_SCENE_STROKE_C, alpha: 1 });
 
     const lineD = new Graphics();
     lineD
-      .lineStyle(LINES_SCENE_LINE_WIDTH, LINES_SCENE_STROKE_D, 1)
       .moveTo(40, 180)
       .lineTo(400, 200)
-      .lineTo(280, 280);
+      .lineTo(280, 280)
+      .stroke({ width: LINES_SCENE_LINE_WIDTH, color: LINES_SCENE_STROKE_D, alpha: 1 });
 
     root.addChild(lineA, lineB, lineC, lineD);
     return root;

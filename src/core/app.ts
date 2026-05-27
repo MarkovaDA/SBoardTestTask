@@ -89,7 +89,7 @@ export class App {
       if (!(button instanceof HTMLButtonElement)) {
         throw new Error(`Scene button btn-scene-${index} not found`);
       }
-      
+
       sceneButtons.push(button);
     }
 
@@ -127,6 +127,7 @@ export class App {
 
     app.sceneButtons.push(...sceneButtons);
     app.autoSceneBtn = autoSceneBtn;
+
     app.initSceneSwitcher();
     app.setupSceneControls();
 
@@ -154,6 +155,7 @@ export class App {
       this.preparedScenes.entries,
       this.handleSceneChange,
     );
+    
     this.onSceneSwitched(this.sceneSwitcher.currentScene, this.sceneSwitcher.activeIndex);
   }
 

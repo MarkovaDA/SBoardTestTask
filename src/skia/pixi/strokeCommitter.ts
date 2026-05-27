@@ -1,6 +1,6 @@
 import { Graphics, GraphicsPath, type Container as PixiContainer } from 'pixi.js';
 
-/** Commits legacy open paths (lineStyle + moveTo/lineTo) so Pixi and Skia share instructions. */
+/** Commits any remaining open stroke paths so Pixi and Skia share instructions. */
 export class PendingStrokeCommitter {
   commit(node: PixiContainer): void {
     if (node instanceof Graphics) {
