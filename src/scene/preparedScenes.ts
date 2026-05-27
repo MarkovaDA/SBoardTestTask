@@ -1,4 +1,4 @@
-import type { Container } from 'pixi.js';
+﻿import type { Container } from 'pixi.js-legacy';
 
 import { DemoScene } from './demoScene';
 import { LinesScene } from './linesScene';
@@ -15,9 +15,10 @@ export class PreparedScenes {
 
   constructor() {
     this.entries = [
-      { label: 'Демо (ТЗ)', container: new DemoScene().build() },
-      { label: 'Фигуры', container: new ShapesScene().build() },
-      { label: 'Линии', container: new LinesScene().build() },
+      { label: 'Р”РµРјРѕ (РўР—)', container: new DemoScene().build() },
+      { label: 'Р¤РёРіСѓСЂС‹', container: new ShapesScene().build() },
+      { label: 'Р›РёРЅРёРё', container: new LinesScene().build() },
     ];
   }
 }
+

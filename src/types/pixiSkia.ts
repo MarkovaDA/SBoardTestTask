@@ -1,6 +1,6 @@
-import type { CanvasKit, Surface } from 'canvaskit-wasm';
+﻿import type { CanvasKit, Surface } from 'canvaskit-wasm';
 
-import type { Container } from 'pixi.js';
+import type { Container } from 'pixi.js-legacy';
 
 export type { Container as PixiContainer };
 
@@ -14,3 +14,4 @@ export interface ISkiaRenderer {
 export type SkiaRenderTarget =
   | { kind: 'html-canvas'; canvas: HTMLCanvasElement }
   | { kind: 'surface'; surface: Surface };
+

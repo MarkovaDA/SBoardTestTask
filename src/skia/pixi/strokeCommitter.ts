@@ -1,4 +1,4 @@
-import { Graphics, GraphicsPath, type Container as PixiContainer } from 'pixi.js';
+﻿import { Graphics, type Container as PixiContainer } from 'pixi.js-legacy';
 
 /** Commits any remaining open stroke paths so Pixi and Skia share instructions. */
 export class PendingStrokeCommitter {
@@ -12,7 +12,7 @@ export class PendingStrokeCommitter {
     }
   }
 
-  private hasDrawablePath(path: GraphicsPath | undefined): boolean {
+  private hasDrawablePath(path: { instructions?: Array<{ action?: string }> } | undefined): boolean {
     if (!path?.instructions) {
       return false;
     }
@@ -23,11 +23,17 @@ export class PendingStrokeCommitter {
   }
 
   private commitGraphicsStroke(graphics: Graphics): void {
-    const ctx = graphics.context as unknown as {
-      _activePath?: GraphicsPath;
+    const ctx = (graphics as unknown as { context?: unknown }).context as
+      | {
+      _activePath?: { instructions?: Array<{ action?: string }> };
       strokeStyle?: { width?: number };
       stroke?: () => void;
-    };
+    }
+      | undefined;
+
+    if (!ctx) {
+      return;
+    }
 
     const activePath = ctx._activePath;
 
@@ -44,3 +50,4 @@ export class PendingStrokeCommitter {
     ctx.stroke?.();
   }
 }
+

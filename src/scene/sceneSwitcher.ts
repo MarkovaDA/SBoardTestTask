@@ -1,4 +1,4 @@
-import type { Container } from 'pixi.js';
+﻿import type { Container } from 'pixi.js-legacy';
 
 import type { PreparedSceneEntry } from './preparedScenes';
 
@@ -69,3 +69,4 @@ export class SceneSwitcher {
     this.slot.addChild(this.currentScene);
   }
 }
+

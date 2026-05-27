@@ -1,5 +1,5 @@
-import type { ColorSource, ConvertedStrokeStyle } from 'pixi.js';
-import { Color } from 'pixi.js';
+﻿import type { ColorSource } from 'pixi.js-legacy';
+import { Color } from 'pixi.js-legacy';
 
 import type { SkiaCanvasKitApi, SkiaPaintApi } from '../../types';
 
@@ -27,7 +27,7 @@ export class SkiaPaintStyles {
     paint: SkiaPaintApi,
     color: ColorSource,
     alpha: number,
-    style: Pick<ConvertedStrokeStyle, 'width' | 'cap' | 'join'>,
+    style: { width?: number; cap?: 'butt' | 'round' | 'square' | string; join?: 'miter' | 'round' | 'bevel' | string },
   ): void {
     paint.setColor(this.toSkiaColor(color, alpha));
     paint.setStyle(this.canvasKit.PaintStyle.Stroke as number);
@@ -37,7 +37,7 @@ export class SkiaPaintStyles {
     paint.setAntiAlias(true);
   }
 
-  private toSkiaStrokeCap(cap: ConvertedStrokeStyle['cap']): unknown {
+  private toSkiaStrokeCap(cap: string | undefined): unknown {
     switch (cap) {
       case 'round':
         return this.canvasKit.StrokeCap.Round;
@@ -48,7 +48,7 @@ export class SkiaPaintStyles {
     }
   }
 
-  private toSkiaStrokeJoin(join: ConvertedStrokeStyle['join']): unknown {
+  private toSkiaStrokeJoin(join: string | undefined): unknown {
     switch (join) {
       case 'round':
         return this.canvasKit.StrokeJoin.Round;
@@ -59,3 +59,4 @@ export class SkiaPaintStyles {
     }
   }
 }
+

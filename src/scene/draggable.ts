@@ -1,4 +1,4 @@
-import { Container, Rectangle, type FederatedPointerEvent } from 'pixi.js';
+﻿import { Container, Rectangle, type FederatedPointerEvent } from 'pixi.js-legacy';
 
 import type { DragChangeCallback } from '../types';
 
@@ -150,3 +150,4 @@ export class DragController {
     this.draggables.length = 0;
   }
 }
+

@@ -1,5 +1,5 @@
-import type { CanvasKit, Surface } from 'canvaskit-wasm';
-import type { Container } from 'pixi.js';
+﻿import type { CanvasKit, Surface } from 'canvaskit-wasm';
+import type { Container } from 'pixi.js-legacy';
 
 import type {
   ISkiaRenderer,
@@ -55,3 +55,4 @@ export class PixiToSkiaRenderer implements ISkiaRenderer {
     return surface;
   }
 }
+

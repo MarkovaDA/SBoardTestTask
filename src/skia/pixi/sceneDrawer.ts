@@ -1,21 +1,23 @@
-import {
-  buildSVGPath,
+﻿import {
   Container,
   Graphics,
   Sprite,
   type Container as PixiContainer,
-  type ConvertedStrokeStyle,
-  type GraphicsInstructions,
-} from 'pixi.js';
+} from 'pixi.js-legacy';
 
 import type { SkiaCanvasApi, SkiaCanvasKitApi, SkiaPathApi, SkiaRendererOptions } from '../../types';
 
-import { DEFAULT_CANVAS_BACKGROUND, SVG_PATH_PRECISION } from './constants';
+import { DEFAULT_CANVAS_BACKGROUND } from './constants';
 import { SkiaPaintStyles } from './color';
 import { SkiaCanvasTransformer } from './skiaCanvasTransformer';
 
-type FillInstruction = Extract<GraphicsInstructions, { action: 'fill' | 'cut' }>;
-type StrokeInstruction = Extract<GraphicsInstructions, { action: 'stroke' }>;
+type FillInstruction = { data: { path: unknown; style: { color: unknown; alpha: number } } };
+type StrokeInstruction = {
+  data: {
+    path: unknown;
+    style: { color: unknown; alpha: number; width?: number; cap?: unknown; join?: unknown };
+  };
+};
 
 /** Draws a Pixi container tree onto any Skia canvas (preview, PDF page, etc.). */
 export class PixiSceneDrawer {
@@ -35,22 +37,17 @@ export class PixiSceneDrawer {
 
     this.canvasTransform.clearCanvas(canvas, width, height, background);
 
-    let root: Container | null = container;
-    while (root.parent) {
-      root = root.parent;
-    }
-
-    root.updateTransform({});
-
     this.walkScene(canvas, container);
   }
 
   private walkScene(canvas: SkiaCanvasApi, node: PixiContainer): void {
-    if (!node.visible || node.groupAlpha <= 0) {
+    const alpha = (node as unknown as { worldAlpha?: number; groupAlpha?: number }).worldAlpha
+      ?? (node as unknown as { worldAlpha?: number; groupAlpha?: number }).groupAlpha
+      ?? node.alpha;
+
+    if (!node.visible || alpha <= 0) {
       return;
     }
-
-    const alpha = node.groupAlpha;
 
     canvas.save();
     this.canvasTransform.concatGroupTransform(canvas, node);
@@ -69,7 +66,11 @@ export class PixiSceneDrawer {
   }
 
   private renderGraphics(canvas: SkiaCanvasApi, graphics: Graphics, alpha: number): void {
-    const instructions = graphics.context.instructions as GraphicsInstructions[];
+    const instructions = (graphics as unknown as { context?: { instructions?: unknown } }).context?.instructions;
+
+    if (!Array.isArray(instructions)) {
+      return;
+    }
 
     for (const instruction of instructions) {
       if (instruction.action === 'fill' || instruction.action === 'cut') {
@@ -101,7 +102,7 @@ export class PixiSceneDrawer {
       return;
     }
 
-    const style = instruction.data.style as ConvertedStrokeStyle;
+    const style = instruction.data.style;
     const paint = new this.canvasKit.Paint();
 
     this.paintStyles.applyStrokePaint(paint, style.color, style.alpha * alpha, style);
@@ -112,7 +113,7 @@ export class PixiSceneDrawer {
   }
 
   private buildSkPath(graphicsPath: FillInstruction['data']['path']): SkiaPathApi | null {
-    const svgPath = buildSVGPath(graphicsPath, SVG_PATH_PRECISION);
+    const svgPath = this.tryBuildSvgPath(graphicsPath);
     
     if (!svgPath) {
       return null;
@@ -121,15 +122,45 @@ export class PixiSceneDrawer {
     return this.canvasKit.Path.MakeFromSVGString(svgPath);
   }
 
+  private tryBuildSvgPath(graphicsPath: unknown): string | null {
+    if (typeof graphicsPath === 'string') {
+      return graphicsPath;
+    }
+
+    if (
+      graphicsPath
+      && typeof graphicsPath === 'object'
+      && 'toString' in graphicsPath
+      && typeof (graphicsPath as { toString: () => string }).toString === 'function'
+    ) {
+      const value = (graphicsPath as { toString: () => string }).toString();
+      return value && value !== '[object Object]' ? value : null;
+    }
+
+    return null;
+  }
+
   private renderSprite(canvas: SkiaCanvasApi, sprite: Sprite, alpha: number): void {
     const texture = sprite.texture;
-    const source = texture.source;
+    const source = (texture as unknown as { source?: unknown; baseTexture?: { resource?: { source?: unknown } } })
+      .source
+      ?? (texture as unknown as { source?: unknown; baseTexture?: { resource?: { source?: unknown } } })
+        .baseTexture?.resource?.source;
 
-    if (texture.width <= 0 || texture.height <= 0 || source.width <= 0 || source.height <= 0) {
+    if (
+      texture.width <= 0
+      || texture.height <= 0
+      || !source
+      || (source as { width?: number }).width === undefined
+      || (source as { height?: number }).height === undefined
+      || (source as { width: number }).width <= 0
+      || (source as { height: number }).height <= 0
+    ) {
       return;
     }
 
-    const resource = source.resource as CanvasImageSource | undefined;
+    const resource = ((source as { resource?: CanvasImageSource }).resource
+      ?? source) as CanvasImageSource | undefined;
     if (!resource) {
       return;
     }
@@ -167,3 +198,4 @@ export class PixiSceneDrawer {
     skImage.delete();
   }
 }
+

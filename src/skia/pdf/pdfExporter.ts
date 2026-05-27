@@ -1,5 +1,5 @@
-import type { CanvasKit, PDFMetadata } from '@rollerbird/canvaskit-wasm-pdf';
-import type { Container } from 'pixi.js';
+﻿import type { CanvasKit, PDFMetadata } from '@rollerbird/canvaskit-wasm-pdf';
+import type { Container } from 'pixi.js-legacy';
 
 import type { SkiaCanvasApi, SkiaCanvasKitApi, SkiaRendererOptions } from '../../types';
 
@@ -61,3 +61,4 @@ export class SkiaPdfExporter {
     return pdfBytes;
   }
 }
+

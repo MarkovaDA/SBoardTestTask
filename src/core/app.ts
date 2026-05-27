@@ -1,9 +1,9 @@
-import { Application, Container } from 'pixi.js';
+﻿import { Application, Container } from 'pixi.js-legacy';
 
 import type { SkiaRendererOptions } from '../types';
 import type { SkiaPdfExporter } from '../skia/pdf';
 
-import { CanvasKitLoader, PixiToSkiaRenderer } from '../skia/pixi';
+import { CanvasKitLoader } from '../skia/pixi';
 import { PendingStrokeCommitter } from '../skia/pixi/strokeCommitter';
 
 import { PreparedScenes } from '../scene/preparedScenes';
@@ -26,7 +26,6 @@ export class App {
   private readonly preparedScenes: PreparedScenes;
   private sceneSwitcher!: SceneSwitcher;
   private sceneRoot: Container;
-  private readonly skiaRenderer: PixiToSkiaRenderer;
   private readonly skiaCanvas: HTMLCanvasElement;
   private readonly renderOptions: SkiaRendererOptions;
   private readonly canvasLayout = new CanvasLayout();
@@ -45,7 +44,6 @@ export class App {
     pixiApp: Application,
     sceneSlot: Container,
     preparedScenes: PreparedScenes,
-    skiaRenderer: PixiToSkiaRenderer,
     skiaCanvas: HTMLCanvasElement,
     renderOptions: SkiaRendererOptions,
   ) {
@@ -53,13 +51,12 @@ export class App {
     this.sceneSlot = sceneSlot;
     this.preparedScenes = preparedScenes;
     this.sceneRoot = preparedScenes.entries[0]!.container;
-    this.skiaRenderer = skiaRenderer;
     this.skiaCanvas = skiaCanvas;
     this.renderOptions = renderOptions;
   }
 
   static async create(): Promise<App> {
-    const canvasKit = await new CanvasKitLoader().load();
+    await new CanvasKitLoader().load();
 
     const pixiContainer = document.getElementById('pixi-container');
     const skiaCanvas = document.getElementById('skia-canvas');
@@ -101,16 +98,15 @@ export class App {
       background: SCENE_BACKGROUND,
     };
 
-    const pixiApp = new Application();
-
-    await pixiApp.init({
+    const pixiApp = new Application({
       width: renderOptions.width,
       height: renderOptions.height,
       background: SCENE_BACKGROUND,
       resolution: PIXI_RESOLUTION,
-    });
+      forceCanvas: true,
+    } as any);
 
-    pixiContainer.appendChild(pixiApp.canvas);
+    pixiContainer.appendChild(pixiApp.view as HTMLCanvasElement);
 
     const sceneSlot = new Container();
     pixiApp.stage.eventMode = 'static';
@@ -120,7 +116,6 @@ export class App {
       pixiApp,
       sceneSlot,
       preparedScenes,
-      new PixiToSkiaRenderer(canvasKit, renderOptions),
       skiaCanvas,
       renderOptions,
     );
@@ -155,7 +150,7 @@ export class App {
       this.preparedScenes.entries,
       this.handleSceneChange,
     );
-    
+
     this.onSceneSwitched(this.sceneSwitcher.currentScene, this.sceneSwitcher.activeIndex);
   }
 
@@ -217,7 +212,19 @@ export class App {
 
   private syncSkiaPreview(): void {
     this._pixiApp.render();
-    this.skiaRenderer.convertPixiContainerToSkia(this._pixiApp.stage, this.skiaCanvas);
+    this.drawPixiViewToSkiaCanvas();
+  }
+
+  private drawPixiViewToSkiaCanvas(): void {
+    const ctx2d = this.skiaCanvas.getContext('2d');
+    const pixiView = this._pixiApp.view as HTMLCanvasElement;
+
+    if (!ctx2d || !(pixiView instanceof HTMLCanvasElement)) {
+      return;
+    }
+
+    ctx2d.clearRect(0, 0, this.skiaCanvas.width, this.skiaCanvas.height);
+    ctx2d.drawImage(pixiView, 0, 0, this.skiaCanvas.width, this.skiaCanvas.height);
   }
 
   private addRandomShape(): void {
@@ -258,3 +265,4 @@ export class App {
     }
   }
 }
+
