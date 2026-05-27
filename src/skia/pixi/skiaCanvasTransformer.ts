@@ -12,7 +12,9 @@ export class SkiaCanvasTransformer {
 
   /** Same transform Pixi uses when drawing (relative to the render group / canvas). */
   concatGroupTransform(canvas: SkiaCanvasApi, node: Container): void {
-    const matrix = (node as unknown as { worldTransform?: Matrix; groupTransform?: Matrix }).worldTransform
+    const matrix = (node as unknown as { localTransform?: Matrix; worldTransform?: Matrix; groupTransform?: Matrix })
+      .localTransform
+      ?? (node as unknown as { localTransform?: Matrix; worldTransform?: Matrix; groupTransform?: Matrix }).worldTransform
       ?? (node as unknown as { worldTransform?: Matrix; groupTransform?: Matrix }).groupTransform;
     if (!matrix) {
       return;

@@ -257,7 +257,12 @@ export class App {
       }
 
       this._pixiApp.render();
-      const bytes = this.pdfExporter.exportFromCanvas(this._pixiApp.view as HTMLCanvasElement);
+      let bytes: Uint8Array;
+      try {
+        bytes = this.pdfExporter.export(this._pixiApp.stage);
+      } catch {
+        bytes = this.pdfExporter.exportFromCanvas(this._pixiApp.view as HTMLCanvasElement);
+      }
       new pdf.PdfDownloader().download(bytes, PDF_EXPORT_FILENAME);
     } catch (error) {
       console.error('PDF export failed:', error);
