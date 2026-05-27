@@ -6,7 +6,8 @@ import type { SkiaPdfExporter } from '../skia/pdf';
 import { CanvasKitLoader, PixiToSkiaRenderer } from '../skia/pixi';
 import { PendingStrokeCommitter } from '../skia/pixi/strokeCommitter';
 
-import { DemoScene } from '../scene/demoScene';
+import { PreparedScenes } from '../scene/preparedScenes';
+import { SceneSwitcher } from '../scene/sceneSwitcher';
 import { DragController } from '../scene/draggable';
 import { RandomShapeFactory } from '../scene/randomShape';
 
@@ -15,30 +16,43 @@ import {
   PDF_EXPORT_ERROR_MESSAGE,
   PDF_EXPORT_FILENAME,
   PIXI_RESOLUTION,
+  SCENE_AUTO_SWITCH_MS,
   SCENE_BACKGROUND,
 } from './constants';
 
 export class App {
   private readonly _pixiApp: Application;
-  private readonly sceneRoot: Container;
+  private readonly sceneSlot: Container;
+  private readonly preparedScenes: PreparedScenes;
+  private sceneSwitcher!: SceneSwitcher;
+  private sceneRoot: Container;
   private readonly skiaRenderer: PixiToSkiaRenderer;
   private readonly skiaCanvas: HTMLCanvasElement;
   private readonly renderOptions: SkiaRendererOptions;
   private readonly canvasLayout = new CanvasLayout();
   private readonly randomShapeFactory = new RandomShapeFactory();
   private readonly strokeCommitter = new PendingStrokeCommitter();
+  private readonly sceneButtons: HTMLButtonElement[] = [];
   private pdfExporter: SkiaPdfExporter | null = null;
-  private dragController!: DragController;
+  private dragController: DragController | null = null;
+  private autoSceneBtn: HTMLButtonElement | null = null;
+
+  private readonly handleSceneChange = (scene: Container, index: number): void => {
+    this.onSceneSwitched(scene, index);
+  };
 
   private constructor(
     pixiApp: Application,
-    sceneRoot: Container,
+    sceneSlot: Container,
+    preparedScenes: PreparedScenes,
     skiaRenderer: PixiToSkiaRenderer,
     skiaCanvas: HTMLCanvasElement,
     renderOptions: SkiaRendererOptions,
   ) {
     this._pixiApp = pixiApp;
-    this.sceneRoot = sceneRoot;
+    this.sceneSlot = sceneSlot;
+    this.preparedScenes = preparedScenes;
+    this.sceneRoot = preparedScenes.entries[0]!.container;
     this.skiaRenderer = skiaRenderer;
     this.skiaCanvas = skiaCanvas;
     this.renderOptions = renderOptions;
@@ -52,6 +66,7 @@ export class App {
     const exportBtn = document.getElementById('btn-export-pdf');
     const randomBtn = document.getElementById('btn-random-shape');
     const clearBtn = document.getElementById('btn-clear-canvas');
+    const autoSceneBtn = document.getElementById('btn-scene-auto');
 
     if (!pixiContainer || !(skiaCanvas instanceof HTMLCanvasElement)) {
       throw new Error('Required DOM elements not found');
@@ -61,8 +76,21 @@ export class App {
       !(exportBtn instanceof HTMLButtonElement)
       || !(randomBtn instanceof HTMLButtonElement)
       || !(clearBtn instanceof HTMLButtonElement)
+      || !(autoSceneBtn instanceof HTMLButtonElement)
     ) {
       throw new Error('Control panel buttons not found');
+    }
+
+    const preparedScenes = new PreparedScenes();
+    const sceneButtons: HTMLButtonElement[] = [];
+
+    for (let index = 0; index < preparedScenes.entries.length; index += 1) {
+      const button = document.getElementById(`btn-scene-${index}`);
+      if (!(button instanceof HTMLButtonElement)) {
+        throw new Error(`Scene button btn-scene-${index} not found`);
+      }
+      
+      sceneButtons.push(button);
     }
 
     const canvasLayout = new CanvasLayout();
@@ -84,14 +112,23 @@ export class App {
 
     pixiContainer.appendChild(pixiApp.canvas);
 
-    const sceneRoot = new DemoScene().build();
+    const sceneSlot = new Container();
     pixiApp.stage.eventMode = 'static';
-    pixiApp.stage.addChild(sceneRoot);
+    pixiApp.stage.addChild(sceneSlot);
 
-    const skiaRenderer = new PixiToSkiaRenderer(canvasKit, renderOptions);
-    const app = new App(pixiApp, sceneRoot, skiaRenderer, skiaCanvas, renderOptions);
+    const app = new App(
+      pixiApp,
+      sceneSlot,
+      preparedScenes,
+      new PixiToSkiaRenderer(canvasKit, renderOptions),
+      skiaCanvas,
+      renderOptions,
+    );
 
-    app.setupDragging();
+    app.sceneButtons.push(...sceneButtons);
+    app.autoSceneBtn = autoSceneBtn;
+    app.initSceneSwitcher();
+    app.setupSceneControls();
 
     exportBtn.addEventListener('click', () => {
       void app.exportPdf();
@@ -111,7 +148,55 @@ export class App {
     return app;
   }
 
+  private initSceneSwitcher(): void {
+    this.sceneSwitcher = new SceneSwitcher(
+      this.sceneSlot,
+      this.preparedScenes.entries,
+      this.handleSceneChange,
+    );
+    this.onSceneSwitched(this.sceneSwitcher.currentScene, this.sceneSwitcher.activeIndex);
+  }
+
+  private setupSceneControls(): void {
+    this.sceneButtons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        this.sceneSwitcher.switchTo(index);
+      });
+    });
+
+    this.autoSceneBtn?.addEventListener('click', () => {
+      if (this.sceneSwitcher.isAutoRotateEnabled) {
+        this.sceneSwitcher.stopAutoRotate();
+      } else {
+        this.sceneSwitcher.startAutoRotate(SCENE_AUTO_SWITCH_MS);
+      }
+      this.updateSceneButtons();
+    });
+  }
+
+  private onSceneSwitched(scene: Container, _index: number): void {
+    try {
+      this.sceneRoot = scene;
+      this.setupDragging();
+      this.updateSceneButtons();
+      this.syncSkiaPreview();
+    } catch (error) {
+      console.error('Scene switch failed:', error);
+    }
+  }
+
+  private updateSceneButtons(): void {
+    const activeIndex = this.sceneSwitcher.activeIndex;
+
+    this.sceneButtons.forEach((button, index) => {
+      button.classList.toggle('is-active', index === activeIndex);
+    });
+
+    this.autoSceneBtn?.classList.toggle('is-active', this.sceneSwitcher.isAutoRotateEnabled);
+  }
+
   private setupDragging(): void {
+    this.dragController?.clear();
     this.dragController = new DragController(this._pixiApp.stage, () => this.syncSkiaPreview());
     this.strokeCommitter.commit(this.sceneRoot);
     this.dragController.enableOnDescendants(this.sceneRoot);
@@ -136,12 +221,12 @@ export class App {
   private addRandomShape(): void {
     const shape = this.randomShapeFactory.addTo(this.sceneRoot);
     this.strokeCommitter.commit(shape);
-    this.dragController.enableOn(shape);
+    this.dragController?.enableOn(shape);
     this.syncSkiaPreview();
   }
 
   private clearCanvas(): void {
-    this.dragController.clear();
+    this.dragController?.clear();
 
     for (const child of this.sceneRoot.removeChildren()) {
       child.destroy({ children: true });

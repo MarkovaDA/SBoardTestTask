@@ -1,6 +1,6 @@
 import './style.css';
 
-import { App } from './core/App';
+import { App } from './core/App'
 
 class ApplicationEntry {
   async run(): Promise<void> {

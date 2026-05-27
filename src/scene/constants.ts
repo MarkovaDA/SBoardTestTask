@@ -70,3 +70,30 @@ export const DEMO_G4_ANGLE = 20;
 
 export const DEMO_SUB_CONTAINER_X = 75;
 export const DEMO_SUB_CONTAINER_Y = 50;
+
+export const SHAPES_CIRCLE_FILL = '#4ecdc4';
+export const SHAPES_CIRCLE_RADIUS = 55;
+export const SHAPES_CIRCLE_X = 120;
+export const SHAPES_CIRCLE_Y = 100;
+
+export const SHAPES_RECT_FILL = '#ffe66d';
+export const SHAPES_RECT_WIDTH = 120;
+export const SHAPES_RECT_HEIGHT = 80;
+export const SHAPES_RECT_X = 280;
+export const SHAPES_RECT_Y = 90;
+
+export const SHAPES_TRIANGLE_FILL = '#a29bfe';
+export const SHAPES_TRIANGLE_SIZE = 50;
+export const SHAPES_TRIANGLE_X = 200;
+export const SHAPES_TRIANGLE_Y = 220;
+
+export const SHAPES_STAR_FILL = '#fd79a8';
+export const SHAPES_STAR_POINTS = 5;
+export const SHAPES_STAR_X = 360;
+export const SHAPES_STAR_Y = 200;
+
+export const LINES_SCENE_LINE_WIDTH = 8;
+export const LINES_SCENE_STROKE_A = '#ffffff';
+export const LINES_SCENE_STROKE_B = '#00cec9';
+export const LINES_SCENE_STROKE_C = '#fdcb6e';
+export const LINES_SCENE_STROKE_D = '#ff6b6b';

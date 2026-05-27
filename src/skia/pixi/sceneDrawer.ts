@@ -12,7 +12,7 @@ import type { SkiaCanvasApi, SkiaCanvasKitApi, SkiaPathApi, SkiaRendererOptions 
 
 import { DEFAULT_CANVAS_BACKGROUND, SVG_PATH_PRECISION } from './constants';
 import { SkiaPaintStyles } from './color';
-import { SkiaCanvasTransformer } from './matrix';
+import { SkiaCanvasTransformer } from './skiaCanvasTransformer';
 
 type FillInstruction = Extract<GraphicsInstructions, { action: 'fill' | 'cut' }>;
 type StrokeInstruction = Extract<GraphicsInstructions, { action: 'stroke' }>;

@@ -12,7 +12,11 @@ export class PendingStrokeCommitter {
     }
   }
 
-  private hasDrawablePath(path: GraphicsPath): boolean {
+  private hasDrawablePath(path: GraphicsPath | undefined): boolean {
+    if (!path?.instructions) {
+      return false;
+    }
+
     return path.instructions.some(
       (instruction) => instruction.action !== 'moveTo' && instruction.action !== 'closePath',
     );
@@ -20,23 +24,23 @@ export class PendingStrokeCommitter {
 
   private commitGraphicsStroke(graphics: Graphics): void {
     const ctx = graphics.context as unknown as {
-      _activePath: GraphicsPath;
-      strokeStyle: { width?: number };
-      stroke(): void;
+      _activePath?: GraphicsPath;
+      strokeStyle?: { width?: number };
+      stroke?: () => void;
     };
-    
+
     const activePath = ctx._activePath;
 
     if (!this.hasDrawablePath(activePath)) {
       return;
     }
 
-    const width = ctx.strokeStyle.width ?? 0;
-    
+    const width = ctx.strokeStyle?.width ?? 0;
+
     if (width <= 0) {
       return;
     }
 
-    ctx.stroke();
+    ctx.stroke?.();
   }
 }

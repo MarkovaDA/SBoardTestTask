@@ -10,3 +10,5 @@ export const PIXI_RESOLUTION = 1;
 
 export const PDF_EXPORT_FILENAME = 'sboard-export.pdf';
 export const PDF_EXPORT_ERROR_MESSAGE = 'Не удалось экспортировать PDF. Подробности в консоли.';
+
+export const SCENE_AUTO_SWITCH_MS = 4000;

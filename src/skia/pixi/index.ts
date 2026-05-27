@@ -3,7 +3,7 @@
  */
 export { CanvasKitLoader } from './canvasLoader';
 export { PendingStrokeCommitter } from './strokeCommitter';
-export { SkiaCanvasTransformer as SkiaCanvasTransform } from './matrix';
+export { SkiaCanvasTransformer as SkiaCanvasTransform } from './skiaCanvasTransformer';
 export { SkiaPaintStyles } from './color';
 export { PixiSceneDrawer } from './sceneDrawer';
 export { PixiToSkiaRenderer } from './pixiToSkiaRenderer';

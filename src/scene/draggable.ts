@@ -135,10 +135,10 @@ export class DragController {
 
   enableOnDescendants(root: Container): void {
     for (const child of root.children) {
-      this.enableOn(child);
-
       if (child instanceof Container && child.children.length > 0) {
         this.enableOnDescendants(child);
+      } else {
+        this.enableOn(child);
       }
     }
   }
