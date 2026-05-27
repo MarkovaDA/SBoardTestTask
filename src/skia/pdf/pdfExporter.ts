@@ -60,5 +60,39 @@ export class SkiaPdfExporter {
 
     return pdfBytes;
   }
+
+  exportFromCanvas(sourceCanvas: HTMLCanvasElement): Uint8Array {
+    const { width, height } = this.options;
+
+    const metadata = {
+      title: PDF_METADATA_TITLE,
+      author: PDF_METADATA_AUTHOR,
+      creator: PDF_METADATA_CREATOR,
+      producer: PDF_METADATA_PRODUCER,
+      rasterDPI: PDF_RASTER_DPI,
+      compressionLevel: this.canvasKit.PDFCompressionLevel.Default,
+      _rootTag: null,
+    } as PDFMetadata & { _rootTag: null };
+
+    const doc = this.canvasKit.MakePDFDocument(metadata);
+    const pageCanvas = doc.beginPage(width, height);
+
+    const image = this.canvasKit.MakeImageFromCanvasImageSource(sourceCanvas);
+
+    if (image) {
+      const paint = new this.canvasKit.Paint();
+      const src: [number, number, number, number] = [0, 0, sourceCanvas.width, sourceCanvas.height];
+      const dest: [number, number, number, number] = [0, 0, width, height];
+      pageCanvas.drawImageRect(image, src, dest, paint, false);
+      paint.delete();
+      image.delete();
+    }
+
+    doc.endPage();
+    const pdfBytes = doc.close();
+    doc.delete();
+
+    return pdfBytes;
+  }
 }
 
