@@ -2,6 +2,10 @@
 
 Веб-приложение на TypeScript: Pixi.js + Skia (CanvasKit), обёртка рендера Pixi-контейнера в Skia и **векторный** экспорт в PDF через Skia PDF backend.
 
+## Деплой
+
+- Прод-версия приложения: [https://markovada.github.io/SBoardTestTask/](https://markovada.github.io/SBoardTestTask/)
+
 ## Стек
 
 - [Pixi.js](https://pixijs.com/) — интерактивная сцена (WebGL)
