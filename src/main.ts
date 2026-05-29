@@ -6,15 +6,17 @@ import { AppLoader } from './ui/loader';
 class ApplicationEntry {
   private readonly loader = new AppLoader();
 
-  async run(): Promise<void> {
+  run(): void {
     try {
-      await App.create();
+      App.create();
     } finally {
       this.loader.hide();
     }
   }
 }
 
-new ApplicationEntry().run().catch((error: unknown) => {
+try {
+  new ApplicationEntry().run();
+} catch (error: unknown) {
   console.error(error);
-});
+}

@@ -3,7 +3,6 @@
 import type { SkiaRendererOptions } from '../types';
 import type { SkiaPdfExporter } from '../skia/pdf';
 
-import { CanvasKitLoader } from '../skia/pixi';
 import { PendingStrokeCommitter } from '../skia/pixi/strokeCommitter';
 
 import { PreparedScenes } from '../scene/preparedScenes';
@@ -28,9 +27,11 @@ export class App {
   private sceneRoot: Container;
   private readonly skiaCanvas: HTMLCanvasElement;
   private readonly renderOptions: SkiaRendererOptions;
+
   private readonly canvasLayout = new CanvasLayout();
   private readonly randomShapeFactory = new RandomShapeFactory();
   private readonly strokeCommitter = new PendingStrokeCommitter();
+
   private readonly sceneButtons: HTMLButtonElement[] = [];
   private pdfExporter: SkiaPdfExporter | null = null;
   private dragController: DragController | null = null;
@@ -55,9 +56,7 @@ export class App {
     this.renderOptions = renderOptions;
   }
 
-  static async create(): Promise<App> {
-    await new CanvasKitLoader().load();
-
+  static create(): App {
     const pixiContainer = document.getElementById('pixi-container');
     const skiaCanvas = document.getElementById('skia-canvas');
     const exportBtn = document.getElementById('btn-export-pdf');
@@ -167,6 +166,7 @@ export class App {
       } else {
         this.sceneSwitcher.startAutoRotate(SCENE_AUTO_SWITCH_MS);
       }
+
       this.updateSceneButtons();
     });
   }
@@ -194,6 +194,7 @@ export class App {
 
   private setupDragging(): void {
     this.dragController?.clear();
+
     this.dragController = new DragController(this._pixiApp.stage, () => this.syncSkiaPreview());
     this.strokeCommitter.commit(this.sceneRoot);
     this.dragController.enableOnDescendants(this.sceneRoot);
@@ -201,11 +202,13 @@ export class App {
 
   private applyCanvasSize(): void {
     const { width, height } = this.canvasLayout.getViewportCanvasSize();
+
     this.renderOptions.width = width;
     this.renderOptions.height = height;
     this._pixiApp.renderer.resize(width, height);
     this.skiaCanvas.width = width;
     this.skiaCanvas.height = height;
+
     this.pdfExporter = null;
     this.syncSkiaPreview();
   }
@@ -229,6 +232,7 @@ export class App {
 
   private addRandomShape(): void {
     const shape = this.randomShapeFactory.addTo(this.sceneRoot);
+
     this.strokeCommitter.commit(shape);
     this.dragController?.enableOn(shape);
     this.syncSkiaPreview();
@@ -257,12 +261,14 @@ export class App {
       }
 
       this._pixiApp.render();
+
       let bytes: Uint8Array;
       try {
         bytes = this.pdfExporter.export(this._pixiApp.stage);
       } catch {
         bytes = this.pdfExporter.exportFromCanvas(this._pixiApp.view as HTMLCanvasElement);
       }
+
       new pdf.PdfDownloader().download(bytes, PDF_EXPORT_FILENAME);
     } catch (error) {
       console.error('PDF export failed:', error);
@@ -270,4 +276,3 @@ export class App {
     }
   }
 }
-
