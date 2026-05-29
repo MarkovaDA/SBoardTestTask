@@ -1,6 +1,6 @@
 ﻿import type { Container } from 'pixi.js-legacy';
 
-import type { PreparedSceneEntry } from './preparedScenes';
+import type { PreparedScenes } from './preparedScenes';
 
 export type SceneChangeHandler = (scene: Container, index: number) => void;
 
@@ -11,14 +11,12 @@ export class SceneSwitcher {
 
   constructor(
     private readonly slot: Container,
-    private readonly entries: readonly PreparedSceneEntry[],
+    private readonly scenes: PreparedScenes,
     private readonly onSceneChange: SceneChangeHandler,
-  ) {
-    this.mountCurrentScene();
-  }
+  ) {}
 
   get currentScene(): Container {
-    return this.entries[this.currentIndex]!.container;
+    return this.scenes.getScene(this.currentIndex);
   }
 
   get activeIndex(): number {
@@ -29,22 +27,31 @@ export class SceneSwitcher {
     return this.autoTimer !== null;
   }
 
-  switchTo(index: number): void {
-    if (index < 0 || index >= this.entries.length || index === this.currentIndex) {
+  async mountInitialScene(): Promise<void> {
+    await this.scenes.ensureScene(0);
+    this.mountCurrentScene();
+    this.onSceneChange(this.currentScene, this.currentIndex);
+  }
+
+  async switchTo(index: number): Promise<void> {
+    if (index < 0 || index >= this.scenes.sceneCount || index === this.currentIndex) {
       return;
     }
 
     this.stopAutoRotate();
-    this.applyIndex(index);
+    await this.applyIndex(index);
   }
 
   startAutoRotate(intervalMs: number): void {
     this.stopAutoRotate();
 
     const tick = (): void => {
-      const nextIndex = (this.currentIndex + 1) % this.entries.length;
-      this.applyIndex(nextIndex);
-      this.autoTimer = setTimeout(tick, intervalMs);
+      const nextIndex = (this.currentIndex + 1) % this.scenes.sceneCount;
+      void this.applyIndex(nextIndex).then(() => {
+        if (this.autoTimer !== null) {
+          this.autoTimer = setTimeout(tick, intervalMs);
+        }
+      });
     };
 
     this.autoTimer = setTimeout(tick, intervalMs);
@@ -57,9 +64,9 @@ export class SceneSwitcher {
     }
   }
 
-  private applyIndex(index: number): void {
+  private async applyIndex(index: number): Promise<void> {
+    await this.scenes.ensureScene(index);
     this.currentIndex = index;
-    
     this.mountCurrentScene();
     this.onSceneChange(this.currentScene, this.currentIndex);
   }
@@ -69,4 +76,3 @@ export class SceneSwitcher {
     this.slot.addChild(this.currentScene);
   }
 }
-

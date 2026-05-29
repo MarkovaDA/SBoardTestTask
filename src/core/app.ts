@@ -1,4 +1,4 @@
-﻿import { Application, Container } from 'pixi.js-legacy';
+﻿import type { Application, Container } from 'pixi.js-legacy';
 
 import type { SkiaRendererOptions } from '../types';
 import type { SkiaPdfExporter } from '../skia/pdf';
@@ -19,12 +19,20 @@ import {
   SCENE_BACKGROUND,
 } from './constants';
 
+function scheduleIdle(task: () => void): void {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(task, { timeout: 3000 });
+  } else {
+    setTimeout(task, 500);
+  }
+}
+
 export class App {
   private readonly _pixiApp: Application;
   private readonly sceneSlot: Container;
   private readonly preparedScenes: PreparedScenes;
   private sceneSwitcher!: SceneSwitcher;
-  private sceneRoot: Container;
+  private sceneRoot!: Container;
   private readonly skiaCanvas: HTMLCanvasElement;
   private readonly renderOptions: SkiaRendererOptions;
 
@@ -51,12 +59,11 @@ export class App {
     this._pixiApp = pixiApp;
     this.sceneSlot = sceneSlot;
     this.preparedScenes = preparedScenes;
-    this.sceneRoot = preparedScenes.entries[0]!.container;
     this.skiaCanvas = skiaCanvas;
     this.renderOptions = renderOptions;
   }
 
-  static create(): App {
+  static async create(): Promise<App> {
     const pixiContainer = document.getElementById('pixi-container');
     const skiaCanvas = document.getElementById('skia-canvas');
     const exportBtn = document.getElementById('btn-export-pdf');
@@ -80,7 +87,7 @@ export class App {
     const preparedScenes = new PreparedScenes();
     const sceneButtons: HTMLButtonElement[] = [];
 
-    for (let index = 0; index < preparedScenes.entries.length; index += 1) {
+    for (let index = 0; index < preparedScenes.sceneCount; index += 1) {
       const button = document.getElementById(`btn-scene-${index}`);
       if (!(button instanceof HTMLButtonElement)) {
         throw new Error(`Scene button btn-scene-${index} not found`);
@@ -97,13 +104,15 @@ export class App {
       background: SCENE_BACKGROUND,
     };
 
+    const { Application, Container } = await import('pixi.js-legacy');
+
     const pixiApp = new Application({
       width: renderOptions.width,
       height: renderOptions.height,
       background: SCENE_BACKGROUND,
       resolution: PIXI_RESOLUTION,
       forceCanvas: true,
-    } as any);
+    } as ConstructorParameters<typeof Application>[0]);
 
     pixiContainer.appendChild(pixiApp.view as HTMLCanvasElement);
 
@@ -122,7 +131,7 @@ export class App {
     app.sceneButtons.push(...sceneButtons);
     app.autoSceneBtn = autoSceneBtn;
 
-    app.initSceneSwitcher();
+    await app.initSceneSwitcher();
     app.setupSceneControls();
 
     exportBtn.addEventListener('click', () => {
@@ -140,23 +149,26 @@ export class App {
     app.applyCanvasSize();
 
     window.addEventListener('resize', () => app.applyCanvasSize());
+
+    scheduleIdle(() => preparedScenes.preloadOthers(0));
+
     return app;
   }
 
-  private initSceneSwitcher(): void {
+  private async initSceneSwitcher(): Promise<void> {
     this.sceneSwitcher = new SceneSwitcher(
       this.sceneSlot,
-      this.preparedScenes.entries,
+      this.preparedScenes,
       this.handleSceneChange,
     );
 
-    this.onSceneSwitched(this.sceneSwitcher.currentScene, this.sceneSwitcher.activeIndex);
+    await this.sceneSwitcher.mountInitialScene();
   }
 
   private setupSceneControls(): void {
     this.sceneButtons.forEach((button, index) => {
       button.addEventListener('click', () => {
-        this.sceneSwitcher.switchTo(index);
+        void this.sceneSwitcher.switchTo(index);
       });
     });
 
