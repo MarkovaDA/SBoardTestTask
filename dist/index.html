@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SBoard Test Task</title>
-  <script type="module" crossorigin src="/assets/index-D1nRhAtL.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-DYWWGLpp.css">
+  <script type="module" crossorigin src="/assets/index-edOIRMV1.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DxXTBxc3.css">
+  <link rel="modulepreload" crossorigin href="/assets/app-BsiYyoK2.js">
+  <link rel="modulepreload" crossorigin href="/assets/lib-c0imMY-T.js">
 </head>
 <body>
   <div id="app-loader" class="app-loader" aria-live="polite" aria-label="Загрузка приложения">
@@ -26,7 +28,16 @@
     </div>
   </aside>
 
-  <div class="panels">
+  <div class="panels" id="canvas-panels">
+    <div
+      id="canvas-panels-loader"
+      class="canvas-panels-loader"
+      aria-live="polite"
+      aria-label="Подготовка canvas"
+    >
+      <div class="app-loader__spinner" aria-hidden="true"></div>
+      <p class="canvas-panels-loader__text">Подготовка canvas...</p>
+    </div>
     <section>
       <h2>Pixi.js</h2>
       <div id="pixi-container"></div>

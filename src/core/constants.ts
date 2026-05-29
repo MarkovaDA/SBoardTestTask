@@ -12,3 +12,6 @@ export const PDF_EXPORT_FILENAME = 'sboard-export.pdf';
 export const PDF_EXPORT_ERROR_MESSAGE = 'Не удалось экспортировать PDF. Подробности в консоли.';
 
 export const SCENE_AUTO_SWITCH_MS = 4000;
+
+/** Delay before preloading inactive scenes (keeps first paint network idle). */
+export const SCENE_PRELOAD_DELAY_MS = 5000;

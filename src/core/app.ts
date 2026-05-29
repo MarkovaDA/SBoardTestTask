@@ -17,15 +17,8 @@ import {
   PIXI_RESOLUTION,
   SCENE_AUTO_SWITCH_MS,
   SCENE_BACKGROUND,
+  SCENE_PRELOAD_DELAY_MS,
 } from './constants';
-
-function scheduleIdle(task: () => void): void {
-  if (typeof requestIdleCallback === 'function') {
-    requestIdleCallback(task, { timeout: 3000 });
-  } else {
-    setTimeout(task, 500);
-  }
-}
 
 export class App {
   private readonly _pixiApp: Application;
@@ -150,7 +143,9 @@ export class App {
 
     window.addEventListener('resize', () => app.applyCanvasSize());
 
-    scheduleIdle(() => preparedScenes.preloadOthers(0));
+    window.setTimeout(() => {
+      preparedScenes.preloadOthers(0);
+    }, SCENE_PRELOAD_DELAY_MS);
 
     return app;
   }
