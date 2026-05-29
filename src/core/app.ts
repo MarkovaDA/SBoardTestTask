@@ -113,7 +113,7 @@ export class App {
       height: renderOptions.height,
       background: SCENE_BACKGROUND,
       resolution: PIXI_RESOLUTION,
-      preference: 'webgl',
+      forceCanvas: true,
     } as ConstructorParameters<typeof Application>[0]);
 
     pixiContainer.appendChild(pixiApp.view as HTMLCanvasElement);
