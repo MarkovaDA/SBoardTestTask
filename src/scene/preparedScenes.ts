@@ -42,18 +42,6 @@ export class PreparedScenes {
     return loadPromise;
   }
 
-  preload(index: number): void {
-    void this.ensureScene(index);
-  }
-
-  preloadOthers(activeIndex: number): void {
-    for (let index = 0; index < this.sceneCount; index += 1) {
-      if (index !== activeIndex) {
-        this.preload(index);
-      }
-    }
-  }
-
   private async loadScene(index: number): Promise<Container> {
     switch (index) {
       case 0: {

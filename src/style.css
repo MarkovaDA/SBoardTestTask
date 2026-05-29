@@ -55,6 +55,11 @@ h2 {
   background: #00b894;
 }
 
+.control-panel:not(.control-panel--ready) button {
+  opacity: 0.55;
+  cursor: wait;
+}
+
 .scene-switcher {
   display: flex;
   flex-wrap: wrap;
@@ -84,6 +89,13 @@ h2 {
   flex: 1 1 50%;
   min-width: 0;
   max-width: 50%;
+}
+
+#pixi-container,
+#skia-canvas {
+  min-height: 240px;
+  background: #2d2d44;
+  border-radius: 8px;
 }
 
 .panels canvas,

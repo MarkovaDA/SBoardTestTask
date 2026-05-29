@@ -1,24 +1,27 @@
-﻿import type { Application, Container } from 'pixi.js-legacy';
+﻿import type { Application, Container, Graphics } from 'pixi.js-legacy';
 
 import type { SkiaRendererOptions } from '../types';
 import type { SkiaPdfExporter } from '../skia/pdf';
 
 import { PendingStrokeCommitter } from '../skia/pixi/strokeCommitter';
 
+import type { DragController } from '../scene/draggable';
 import { PreparedScenes } from '../scene/preparedScenes';
 import { SceneSwitcher } from '../scene/sceneSwitcher';
-import { DragController } from '../scene/draggable';
-import { RandomShapeFactory } from '../scene/randomShape';
 
+import { setControlPanelReady } from '../ui/controlPanel';
 import { CanvasLayout } from './layout';
 import {
+  PDF_EXPORT_BUTTON_LABEL,
   PDF_EXPORT_ERROR_MESSAGE,
   PDF_EXPORT_FILENAME,
+  PDF_EXPORT_LOADING_LABEL,
   PIXI_RESOLUTION,
   SCENE_AUTO_SWITCH_MS,
   SCENE_BACKGROUND,
-  SCENE_PRELOAD_DELAY_MS,
 } from './constants';
+
+export type AppBootProgress = (message: string) => void;
 
 export class App {
   private readonly _pixiApp: Application;
@@ -28,9 +31,9 @@ export class App {
   private sceneRoot!: Container;
   private readonly skiaCanvas: HTMLCanvasElement;
   private readonly renderOptions: SkiaRendererOptions;
+  private readonly exportBtn: HTMLButtonElement;
 
   private readonly canvasLayout = new CanvasLayout();
-  private readonly randomShapeFactory = new RandomShapeFactory();
   private readonly strokeCommitter = new PendingStrokeCommitter();
 
   private readonly sceneButtons: HTMLButtonElement[] = [];
@@ -48,15 +51,19 @@ export class App {
     preparedScenes: PreparedScenes,
     skiaCanvas: HTMLCanvasElement,
     renderOptions: SkiaRendererOptions,
+    exportBtn: HTMLButtonElement,
   ) {
     this._pixiApp = pixiApp;
     this.sceneSlot = sceneSlot;
     this.preparedScenes = preparedScenes;
     this.skiaCanvas = skiaCanvas;
     this.renderOptions = renderOptions;
+    this.exportBtn = exportBtn;
   }
 
-  static async create(): Promise<App> {
+  static async create(onProgress?: AppBootProgress): Promise<App> {
+    onProgress?.('Проверка интерфейса…');
+
     const pixiContainer = document.getElementById('pixi-container');
     const skiaCanvas = document.getElementById('skia-canvas');
     const exportBtn = document.getElementById('btn-export-pdf');
@@ -97,14 +104,16 @@ export class App {
       background: SCENE_BACKGROUND,
     };
 
+    onProgress?.('Загрузка Pixi…');
     const { Application, Container } = await import('pixi.js-legacy');
 
+    onProgress?.('Инициализация canvas…');
     const pixiApp = new Application({
       width: renderOptions.width,
       height: renderOptions.height,
       background: SCENE_BACKGROUND,
       resolution: PIXI_RESOLUTION,
-      forceCanvas: true,
+      preference: 'webgl',
     } as ConstructorParameters<typeof Application>[0]);
 
     pixiContainer.appendChild(pixiApp.view as HTMLCanvasElement);
@@ -119,11 +128,13 @@ export class App {
       preparedScenes,
       skiaCanvas,
       renderOptions,
+      exportBtn,
     );
 
     app.sceneButtons.push(...sceneButtons);
     app.autoSceneBtn = autoSceneBtn;
 
+    onProgress?.('Загрузка сцены…');
     await app.initSceneSwitcher();
     app.setupSceneControls();
 
@@ -132,7 +143,7 @@ export class App {
     });
 
     randomBtn.addEventListener('click', () => {
-      app.addRandomShape();
+      void app.addRandomShape();
     });
 
     clearBtn.addEventListener('click', () => {
@@ -143,9 +154,7 @@ export class App {
 
     window.addEventListener('resize', () => app.applyCanvasSize());
 
-    window.setTimeout(() => {
-      preparedScenes.preloadOthers(0);
-    }, SCENE_PRELOAD_DELAY_MS);
+    setControlPanelReady(true);
 
     return app;
   }
@@ -181,7 +190,7 @@ export class App {
   private onSceneSwitched(scene: Container, _index: number): void {
     try {
       this.sceneRoot = scene;
-      this.setupDragging();
+      void this.setupDragging();
       this.updateSceneButtons();
       this.syncSkiaPreview();
     } catch (error) {
@@ -199,7 +208,9 @@ export class App {
     this.autoSceneBtn?.classList.toggle('is-active', this.sceneSwitcher.isAutoRotateEnabled);
   }
 
-  private setupDragging(): void {
+  private async setupDragging(): Promise<void> {
+    const { DragController } = await import('../scene/draggable');
+
     this.dragController?.clear();
 
     this.dragController = new DragController(this._pixiApp.stage, () => this.syncSkiaPreview());
@@ -237,8 +248,9 @@ export class App {
     ctx2d.drawImage(pixiView, 0, 0, this.skiaCanvas.width, this.skiaCanvas.height);
   }
 
-  private addRandomShape(): void {
-    const shape = this.randomShapeFactory.addTo(this.sceneRoot);
+  private async addRandomShape(): Promise<void> {
+    const { RandomShapeFactory } = await import('../scene/randomShape');
+    const shape = new RandomShapeFactory().addTo(this.sceneRoot) as Graphics;
 
     this.strokeCommitter.commit(shape);
     this.dragController?.enableOn(shape);
@@ -256,6 +268,10 @@ export class App {
   }
 
   private async exportPdf(): Promise<void> {
+    const previousLabel = this.exportBtn.textContent;
+    this.exportBtn.disabled = true;
+    this.exportBtn.textContent = PDF_EXPORT_LOADING_LABEL;
+
     try {
       const pdf = await import('../skia/pdf');
 
@@ -280,6 +296,9 @@ export class App {
     } catch (error) {
       console.error('PDF export failed:', error);
       alert(PDF_EXPORT_ERROR_MESSAGE);
+    } finally {
+      this.exportBtn.disabled = false;
+      this.exportBtn.textContent = previousLabel ?? PDF_EXPORT_BUTTON_LABEL;
     }
   }
 }

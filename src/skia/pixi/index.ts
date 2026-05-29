@@ -1,9 +1,7 @@
 /**
- * Модуль моста Pixi.js → Skia (CanvasKit): превью на Skia-canvas.
+ * Модуль моста Pixi.js → Skia: отрисовка для PDF и вспомогательные утилиты.
  */
-export { CanvasKitLoader } from './canvasLoader';
 export { PendingStrokeCommitter } from './strokeCommitter';
 export { SkiaCanvasTransformer as SkiaCanvasTransform } from './skiaCanvasTransformer';
 export { SkiaPaintStyles } from './color';
 export { PixiSceneDrawer } from './sceneDrawer';
-export { PixiToSkiaRenderer } from './pixiToSkiaRenderer';
