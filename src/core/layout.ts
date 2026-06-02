@@ -8,6 +8,7 @@ import {
 
 /** ~50% viewport width per panel; height ~50% of the window. */
 export class CanvasLayout {
+  /** Handles get viewport canvas size logic. */
   getViewportCanvasSize(): { width: number; height: number } {
     const width = Math.floor((window.innerWidth - CANVAS_BODY_PADDING - CANVAS_PANEL_GAP) / 2);
     const height = Math.floor(window.innerHeight * CANVAS_VIEWPORT_HEIGHT_RATIO);

@@ -1,6 +1,7 @@
 const PANEL_SELECTOR = '.control-panel';
 
 class ControlPanelElement extends HTMLElement {
+  /** Handles connected callback logic. */
   connectedCallback(): void {
     if (this.dataset.initialized === 'true') {
       return;

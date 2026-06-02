@@ -33,6 +33,7 @@ export class PixiSceneDrawer {
     this.paintStyles = new SkiaPaintStyles(canvasKit);
   }
 
+  /** Handles draw logic. */
   draw(container: Container, canvas: SkiaCanvasApi): void {
     const { width, height, background = DEFAULT_CANVAS_BACKGROUND } = this.options;
 
@@ -41,6 +42,7 @@ export class PixiSceneDrawer {
     this.walkScene(canvas, container);
   }
 
+  /** Handles walk scene logic. */
   private walkScene(canvas: SkiaCanvasApi, node: PixiContainer): void {
     const alpha = (node as unknown as { worldAlpha?: number; groupAlpha?: number }).worldAlpha
       ?? (node as unknown as { worldAlpha?: number; groupAlpha?: number }).groupAlpha
@@ -66,6 +68,7 @@ export class PixiSceneDrawer {
     }
   }
 
+  /** Handles render graphics logic. */
   private renderGraphics(canvas: SkiaCanvasApi, graphics: Graphics, alpha: number): void {
     const instructions = (graphics as unknown as { context?: { instructions?: unknown } }).context?.instructions;
 
@@ -90,6 +93,7 @@ export class PixiSceneDrawer {
     }
   }
 
+  /** Handles draw fill logic. */
   private drawFill(canvas: SkiaCanvasApi, instruction: FillInstruction, alpha: number): void {
     const path = this.buildSkPath(instruction.data.path);
     
@@ -104,6 +108,7 @@ export class PixiSceneDrawer {
     path.delete();
   }
 
+  /** Handles draw stroke logic. */
   private drawStroke(canvas: SkiaCanvasApi, instruction: StrokeInstruction, alpha: number): void {
     const path = this.buildSkPath(instruction.data.path);
     
@@ -126,6 +131,7 @@ export class PixiSceneDrawer {
     path.delete();
   }
 
+  /** Handles build sk path logic. */
   private buildSkPath(graphicsPath: FillInstruction['data']['path']): SkiaPathApi | null {
     const svgPath = this.tryBuildSvgPath(graphicsPath);
     
@@ -136,6 +142,7 @@ export class PixiSceneDrawer {
     return this.canvasKit.Path.MakeFromSVGString(svgPath);
   }
 
+  /** Handles try build svg path logic. */
   private tryBuildSvgPath(graphicsPath: unknown): string | null {
     if (typeof graphicsPath === 'string') {
       return graphicsPath;
@@ -154,6 +161,7 @@ export class PixiSceneDrawer {
     return null;
   }
 
+  /** Handles draw legacy graphics data logic. */
   private drawLegacyGraphicsData(canvas: SkiaCanvasApi, data: LegacyGraphicsData, alpha: number): void {
     if (!data.shape) {
       return;
@@ -207,6 +215,7 @@ export class PixiSceneDrawer {
     path.delete();
   }
 
+  /** Handles build svg path from legacy shape logic. */
   private buildSvgPathFromLegacyShape(shape: LegacyShape): string | null {
     if (!shape) {
       return null;
@@ -285,6 +294,7 @@ export class PixiSceneDrawer {
     return null;
   }
 
+  /** Handles svg path from points logic. */
   private svgPathFromPoints(points: number[], close: boolean): string | null {
     if (points.length < 4) {
       return null;
@@ -317,14 +327,17 @@ export class PixiSceneDrawer {
     return path;
   }
 
+  /** Handles fmt logic. */
   private fmt(value: number): string {
     return Number.isFinite(value) ? Number(value.toFixed(3)).toString() : '0';
   }
 
+  /** Handles is number logic. */
   private isNumber(value: unknown): value is number {
     return typeof value === 'number' && Number.isFinite(value);
   }
 
+  /** Handles render sprite logic. */
   private renderSprite(canvas: SkiaCanvasApi, sprite: Sprite, alpha: number): void {
     const texture = sprite.texture;
     const source = (texture as unknown as { source?: unknown; baseTexture?: { resource?: { source?: unknown } } })

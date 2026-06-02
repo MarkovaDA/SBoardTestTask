@@ -2,6 +2,7 @@
 
 /** Commits any remaining open stroke paths so Pixi and Skia share instructions. */
 export class PendingStrokeCommitter {
+  /** Handles commit logic. */
   commit(node: PixiContainer): void {
     if (node instanceof Graphics) {
       this.commitGraphicsStroke(node);
@@ -12,6 +13,7 @@ export class PendingStrokeCommitter {
     }
   }
 
+  /** Handles has drawable path logic. */
   private hasDrawablePath(path: { instructions?: Array<{ action?: string }> } | undefined): boolean {
     if (!path?.instructions) {
       return false;
@@ -22,6 +24,7 @@ export class PendingStrokeCommitter {
     );
   }
 
+  /** Handles commit graphics stroke logic. */
   private commitGraphicsStroke(graphics: Graphics): void {
     const ctx = (graphics as unknown as { context?: unknown }).context as
       | {

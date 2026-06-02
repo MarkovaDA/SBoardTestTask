@@ -4,6 +4,7 @@ import canvaskitPdfWasm from '@rollerbird/canvaskit-wasm-pdf/bin/canvaskit.wasm?
 export class CanvasKitPdfLoader {
   private static canvasKitPdfPromise: Promise<CanvasKit> | null = null;
 
+  /** Handles load logic. */
   load(): Promise<CanvasKit> {
     if (!CanvasKitPdfLoader.canvasKitPdfPromise) {
       CanvasKitPdfLoader.canvasKitPdfPromise = CanvasKitPdfInit({

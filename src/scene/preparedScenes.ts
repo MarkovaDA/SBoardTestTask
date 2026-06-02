@@ -9,10 +9,12 @@ export class PreparedScenes {
   private readonly cache: (Container | null)[] = SCENE_LABELS.map(() => null);
   private readonly loading = new Map<number, Promise<Container>>();
 
+  /** Handles get label logic. */
   getLabel(index: number): string {
     return SCENE_LABELS[index] ?? `Scene ${index}`;
   }
 
+  /** Handles get scene logic. */
   getScene(index: number): Container {
     const container = this.cache[index];
     if (!container) {
@@ -21,6 +23,7 @@ export class PreparedScenes {
     return container;
   }
 
+  /** Handles ensure scene logic. */
   async ensureScene(index: number): Promise<Container> {
     const cached = this.cache[index];
     if (cached) {
@@ -42,6 +45,7 @@ export class PreparedScenes {
     return loadPromise;
   }
 
+  /** Handles load scene logic. */
   private async loadScene(index: number): Promise<Container> {
     switch (index) {
       case 0: {

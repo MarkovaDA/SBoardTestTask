@@ -21,6 +21,7 @@ import {
 
 /** Prepared scene: filled primitives. */
 export class ShapesScene {
+  /** Handles build logic. */
   build(): Container {
     const root = new Container();
 

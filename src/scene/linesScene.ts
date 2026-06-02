@@ -10,6 +10,7 @@ import {
 
 /** Prepared scene: several open strokes (lines). */
 export class LinesScene {
+  /** Handles build logic. */
   build(): Container {
     const root = new Container();
 

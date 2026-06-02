@@ -1,6 +1,7 @@
 import { DEFAULT_PDF_FILENAME, PDF_MIME_TYPE } from './constants';
 
 export class PdfDownloader {
+  /** Handles download logic. */
   download(bytes: Uint8Array, filename = DEFAULT_PDF_FILENAME): void {
     const blob = new Blob([Uint8Array.from(bytes)], { type: PDF_MIME_TYPE });
     const url = URL.createObjectURL(blob);

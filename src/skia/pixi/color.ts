@@ -6,6 +6,7 @@ import type { SkiaCanvasKitApi, SkiaPaintApi } from '../../types';
 export class SkiaPaintStyles {
   constructor(private readonly canvasKit: SkiaCanvasKitApi) {}
 
+  /** Handles to skia color logic. */
   toSkiaColor(color: ColorSource, alpha: number): Float32Array | number[] {
     const parsed = Color.shared.setValue(color);
     const a = (parsed.alpha ?? 1) * alpha;
@@ -17,6 +18,7 @@ export class SkiaPaintStyles {
     );
   }
 
+  /** Handles apply fill paint logic. */
   applyFillPaint(paint: SkiaPaintApi, color: ColorSource, alpha: number): void {
     paint.setColor(this.toSkiaColor(color, alpha));
     paint.setStyle(this.canvasKit.PaintStyle.Fill as number);
@@ -47,6 +49,7 @@ export class SkiaPaintStyles {
     paint.setAntiAlias(true);
   }
 
+  /** Handles to skia stroke cap logic. */
   private toSkiaStrokeCap(cap: string | undefined): unknown {
     switch (cap) {
       case 'butt':
@@ -60,6 +63,7 @@ export class SkiaPaintStyles {
     }
   }
 
+  /** Handles to skia stroke join logic. */
   private toSkiaStrokeJoin(join: string | undefined): unknown {
     switch (join) {
       case 'miter':

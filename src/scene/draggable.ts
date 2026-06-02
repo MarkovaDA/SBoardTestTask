@@ -24,6 +24,7 @@ export class Draggable {
     this.attach();
   }
 
+  /** Handles destroy logic. */
   destroy(): void {
     this.endDrag();
     this.target.off('pointerdown', this.onPointerDown);
@@ -32,6 +33,7 @@ export class Draggable {
     this.target.hitArea = null;
   }
 
+  /** Handles ensure hit area logic. */
   private static ensureHitArea(target: Container): void {
     const bounds = target.getLocalBounds();
 
@@ -47,6 +49,7 @@ export class Draggable {
     );
   }
 
+  /** Handles attach logic. */
   private attach(): void {
     Draggable.ensureHitArea(this.target);
     this.target.eventMode = 'static';
@@ -54,6 +57,7 @@ export class Draggable {
     this.target.on('pointerdown', this.onPointerDown);
   }
 
+  /** Handles schedule change logic. */
   private scheduleChange(): void {
     if (!this.onChange || this.syncScheduled) {
       return;
@@ -127,12 +131,14 @@ export class DragController {
     this.onChange = onChange;
   }
 
+  /** Handles enable on logic. */
   enableOn(target: Container): Draggable {
     const draggable = new Draggable(target, this.stage, this.onChange);
     this.draggables.push(draggable);
     return draggable;
   }
 
+  /** Handles enable on descendants logic. */
   enableOnDescendants(root: Container): void {
     for (const child of root.children) {
       if (!(child instanceof Container)) {
@@ -147,6 +153,7 @@ export class DragController {
     }
   }
 
+  /** Handles clear logic. */
   clear(): void {
     for (const draggable of this.draggables) {
       draggable.destroy();

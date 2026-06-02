@@ -36,6 +36,7 @@ import {
 } from './constants';
 
 export class RandomShapeFactory {
+  /** Handles add to logic. */
   addTo(container: Container): Graphics {
     const g = new Graphics();
     const x = RANDOM_SHAPE_X_MIN + Math.random() * RANDOM_SHAPE_X_RANGE;

@@ -27,12 +27,14 @@ export class SceneSwitcher {
     return this.autoTimer !== null;
   }
 
+  /** Handles mount initial scene logic. */
   async mountInitialScene(): Promise<void> {
     await this.scenes.ensureScene(0);
     this.mountCurrentScene();
     this.onSceneChange(this.currentScene, this.currentIndex);
   }
 
+  /** Handles switch to logic. */
   async switchTo(index: number): Promise<void> {
     if (index < 0 || index >= this.scenes.sceneCount || index === this.currentIndex) {
       return;
@@ -42,6 +44,7 @@ export class SceneSwitcher {
     await this.applyIndex(index);
   }
 
+  /** Handles start auto rotate logic. */
   startAutoRotate(intervalMs: number): void {
     this.stopAutoRotate();
 
@@ -57,6 +60,7 @@ export class SceneSwitcher {
     this.autoTimer = setTimeout(tick, intervalMs);
   }
 
+  /** Handles stop auto rotate logic. */
   stopAutoRotate(): void {
     if (this.autoTimer !== null) {
       clearTimeout(this.autoTimer);
@@ -64,6 +68,7 @@ export class SceneSwitcher {
     }
   }
 
+  /** Handles apply index logic. */
   private async applyIndex(index: number): Promise<void> {
     await this.scenes.ensureScene(index);
     this.currentIndex = index;
@@ -71,6 +76,7 @@ export class SceneSwitcher {
     this.onSceneChange(this.currentScene, this.currentIndex);
   }
 
+  /** Handles mount current scene logic. */
   private mountCurrentScene(): void {
     this.slot.removeChildren();
     this.slot.addChild(this.currentScene);

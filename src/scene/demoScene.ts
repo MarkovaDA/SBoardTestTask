@@ -33,6 +33,7 @@ import {
 
 /** Demo scene from the task pseudocode. */
 export class DemoScene {
+  /** Handles build logic. */
   build(): Container {
     const mainContainer = new Container();
     const subContainer = new Container();

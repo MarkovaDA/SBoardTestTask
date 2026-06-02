@@ -23,11 +23,13 @@ export class SkiaPdfExporter {
     private readonly options: SkiaRendererOptions,
   ) {}
 
+  /** Handles create logic. */
   static async create(options: SkiaRendererOptions): Promise<SkiaPdfExporter> {
     const canvasKit = await new CanvasKitPdfLoader().load();
     return new SkiaPdfExporter(canvasKit, options);
   }
 
+  /** Handles export logic. */
   export(container: Container): Uint8Array {
     this.strokeCommitter.commit(container);
 

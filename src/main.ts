@@ -3,6 +3,7 @@ import './style.css';
 import { setControlPanelReady } from './ui/control-panel';
 import { AppLoader, CanvasPanelLoader } from './ui/loader';
 
+/** Handles register service worker logic. */
 function registerServiceWorker(): void {
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) {
     return;
