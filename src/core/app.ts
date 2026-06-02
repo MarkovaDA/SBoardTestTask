@@ -26,17 +26,21 @@ export type AppBootProgress = (message: string) => void;
 export class App {
   private readonly _pixiApp: Application;
   private readonly sceneSlot: Container;
+
   private readonly preparedScenes: PreparedScenes;
   private sceneSwitcher!: SceneSwitcher;
   private sceneRoot!: Container;
+
   private readonly skiaCanvas: HTMLCanvasElement;
-  private readonly renderOptions: SkiaRendererOptions;
   private readonly exportBtn: HTMLButtonElement;
+  private readonly sceneButtons: HTMLButtonElement[] = [];
+
+  private readonly renderOptions: SkiaRendererOptions;
+
 
   private readonly canvasLayout = new CanvasLayout();
   private readonly strokeCommitter = new PendingStrokeCommitter();
 
-  private readonly sceneButtons: HTMLButtonElement[] = [];
   private readonly skiaActivePointers = new Set<number>();
   private pdfExporter: SkiaPdfExporter | null = null;
   private dragController: DragController | null = null;
@@ -192,6 +196,7 @@ export class App {
   private onSceneSwitched(scene: Container, _index: number): void {
     try {
       this.sceneRoot = scene;
+
       this.setupDragging();
       this.updateSceneButtons();
       this.syncSkiaPreview();
@@ -225,7 +230,9 @@ export class App {
 
     this.renderOptions.width = width;
     this.renderOptions.height = height;
+    
     this._pixiApp.renderer.resize(width, height);
+
     this.skiaCanvas.width = width;
     this.skiaCanvas.height = height;
 
@@ -235,6 +242,7 @@ export class App {
 
   private setupSkiaPointerProxy(): void {
     const pixiView = this._pixiApp.view as HTMLCanvasElement;
+    
     if (!(pixiView instanceof HTMLCanvasElement) || typeof PointerEvent === 'undefined') {
       return;
     }
