@@ -8,7 +8,7 @@
 
 ## Стек
 
-- [Pixi.js](https://pixijs.com/) — интерактивная сцена (WebGL)
+- [Pixi.js](https://pixijs.com/) — интерактивная сцена (Canvas 2D, `forceCanvas: true`)
 - [canvaskit-wasm](https://www.npmjs.com/package/canvaskit-wasm) — превью Skia в браузере
 - [@rollerbird/canvaskit-wasm-pdf](deps/rollerbird-canvaskit-wasm-pdf-0.1.3.tgz) — CanvasKit со `skia_enable_pdf=true`
 - [Vite](https://vite.dev/) + TypeScript

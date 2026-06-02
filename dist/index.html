@@ -4,33 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SBoard Test Task</title>
-  <script type="module" crossorigin src="/assets/index-Duoe49xC.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-DYWWGLpp.css">
+  <script type="module" crossorigin src="/SBoardTestTask/assets/index-CUdkDXM2.js"></script>
+  <link rel="stylesheet" crossorigin href="/SBoardTestTask/assets/index-B7oRQK5z.css">
+  <link rel="modulepreload" crossorigin href="/SBoardTestTask/assets/app-CO2h9zOr.js">
+  <link rel="modulepreload" crossorigin href="/SBoardTestTask/assets/pixi-B3-iXj9w.js">
 </head>
 <body>
   <div id="app-loader" class="app-loader" aria-live="polite" aria-label="Загрузка приложения">
     <div class="app-loader__spinner" aria-hidden="true"></div>
-    <p class="app-loader__text">Загрузка canvas...</p>
+    <p class="app-loader__text">Загрузка приложения...</p>
   </div>
-  <aside class="control-panel">
-    <h2>ControlPanel</h2>
-    <button type="button" id="btn-export-pdf">Экспорт в PDF</button>
-    <button type="button" id="btn-random-shape">Сгенерировать случайную линию / фигуру</button>
-    <button type="button" id="btn-clear-canvas">Очистить холст</button>
-    <div class="scene-switcher" role="group" aria-label="Переключение сцен">
-      <span class="scene-switcher__label">Сцены:</span>
-      <button type="button" id="btn-scene-0">Демо (ТЗ)</button>
-      <button type="button" id="btn-scene-1">Фигуры</button>
-      <button type="button" id="btn-scene-2">Линии</button>
-      <button type="button" id="btn-scene-auto">Автопереключение</button>
-    </div>
-  </aside>
+  <control-panel></control-panel>
 
-  <div class="panels">
+  <div class="panels" id="canvas-panels">
+    <div
+      id="canvas-panels-loader"
+      class="canvas-panels-loader"
+      aria-live="polite"
+      aria-label="Подготовка canvas"
+    >
+      <div class="app-loader__spinner" aria-hidden="true"></div>
+      <p class="canvas-panels-loader__text">Подготовка canvas...</p>
+    </div>
+    
     <section>
       <h2>Pixi.js</h2>
       <div id="pixi-container"></div>
     </section>
+    
     <section>
       <h2>Skia (CanvasKit)</h2>
       <canvas id="skia-canvas"></canvas>

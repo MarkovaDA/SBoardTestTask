@@ -1,17 +1,15 @@
-﻿import type { CanvasKit, Surface } from 'canvaskit-wasm';
+﻿import type { Container } from 'pixi.js-legacy';
 
-import type { Container } from 'pixi.js-legacy';
+import type { SkiaCanvasKitApi } from './skiaCanvasKit';
 
-export type { Container as PixiContainer };
+export type PixiContainer = Container;
 
 /** Renders a Pixi display tree through Skia (CanvasKit). */
 export interface ISkiaRenderer {
-  readonly canvasKit: CanvasKit;
-  /** `container` must be on a stage with up-to-date transforms. */
+  readonly canvasKit: SkiaCanvasKitApi;
   convertPixiContainerToSkia(container: Container, skiaCanvas: HTMLCanvasElement): void;
 }
 
 export type SkiaRenderTarget =
   | { kind: 'html-canvas'; canvas: HTMLCanvasElement }
-  | { kind: 'surface'; surface: Surface };
-
+  | { kind: 'surface'; surface: unknown };
