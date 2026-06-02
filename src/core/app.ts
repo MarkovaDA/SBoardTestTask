@@ -192,7 +192,7 @@ export class App {
   private onSceneSwitched(scene: Container, _index: number): void {
     try {
       this.sceneRoot = scene;
-      void this.setupDragging();
+      this.setupDragging();
       this.updateSceneButtons();
       this.syncSkiaPreview();
     } catch (error) {
