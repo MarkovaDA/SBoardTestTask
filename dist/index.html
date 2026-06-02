@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SBoard Test Task</title>
-  <script type="module" crossorigin src="/assets/index-CrJcdEyc.js"></script>
+  <script type="module" crossorigin src="/assets/index-GTjZPRU_.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-D-dOu8lc.css">
-  <link rel="modulepreload" crossorigin href="/assets/app-FWbaIAll.js">
+  <link rel="modulepreload" crossorigin href="/assets/app-Y91_T4Vt.js">
   <link rel="modulepreload" crossorigin href="/assets/pixi-BZzx2cVF.js">
 </head>
 <body>
@@ -14,19 +14,7 @@
     <div class="app-loader__spinner" aria-hidden="true"></div>
     <p class="app-loader__text">Загрузка приложения...</p>
   </div>
-  <aside class="control-panel">
-    <h2>ControlPanel</h2>
-    <button type="button" id="btn-export-pdf" disabled>Экспорт в PDF</button>
-    <button type="button" id="btn-random-shape" disabled>Сгенерировать случайную линию / фигуру</button>
-    <button type="button" id="btn-clear-canvas" disabled>Очистить холст</button>
-    <div class="scene-switcher" role="group" aria-label="Переключение сцен">
-      <span class="scene-switcher__label">Сцены:</span>
-      <button type="button" id="btn-scene-0" disabled>Демо (ТЗ)</button>
-      <button type="button" id="btn-scene-1" disabled>Фигуры</button>
-      <button type="button" id="btn-scene-2" disabled>Линии</button>
-      <button type="button" id="btn-scene-auto" disabled>Автопереключение</button>
-    </div>
-  </aside>
+  <control-panel></control-panel>
 
   <div class="panels" id="canvas-panels">
     <div
@@ -38,10 +26,12 @@
       <div class="app-loader__spinner" aria-hidden="true"></div>
       <p class="canvas-panels-loader__text">Подготовка canvas...</p>
     </div>
+    
     <section>
       <h2>Pixi.js</h2>
       <div id="pixi-container"></div>
     </section>
+    
     <section>
       <h2>Skia (CanvasKit)</h2>
       <canvas id="skia-canvas"></canvas>

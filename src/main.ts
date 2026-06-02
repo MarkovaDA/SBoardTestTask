@@ -1,6 +1,6 @@
 import './style.css';
 
-import { setControlPanelReady } from './ui/controlPanel';
+import { setControlPanelReady } from './ui/control-panel';
 import { AppLoader, CanvasPanelLoader } from './ui/loader';
 
 function registerServiceWorker(): void {

@@ -9,7 +9,7 @@ import type { DragController } from '../scene/draggable';
 import { PreparedScenes } from '../scene/preparedScenes';
 import { SceneSwitcher } from '../scene/sceneSwitcher';
 
-import { setControlPanelReady } from '../ui/controlPanel';
+import { setControlPanelReady } from '../ui/control-panel';
 import { CanvasLayout } from './layout';
 import {
   PDF_EXPORT_BUTTON_LABEL,
