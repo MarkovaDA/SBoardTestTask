@@ -46,10 +46,12 @@ export class App {
   private dragController: DragController | null = null;
   private autoSceneBtn: HTMLButtonElement | null = null;
 
+  /** Handles scene-switcher callbacks and forwards the new scene to App state. */
   private readonly handleSceneChange = (scene: Container, index: number): void => {
     this.onSceneSwitched(scene, index);
   };
 
+  /** Creates App with already prepared runtime dependencies. */
   private constructor(
     pixiApp: Application,
     sceneSlot: Container,
@@ -66,6 +68,7 @@ export class App {
     this.exportBtn = exportBtn;
   }
 
+  /** Bootstraps DOM, Pixi stage, controls and scene lifecycle, then returns ready App instance. */
   static async create(onProgress?: AppBootProgress): Promise<App> {
     onProgress?.('Проверка интерфейса…');
 
@@ -165,6 +168,7 @@ export class App {
     return app;
   }
 
+  /** Initializes scene switcher and mounts the first prepared scene into stage slot. */
   private async initSceneSwitcher(): Promise<void> {
     this.sceneSwitcher = new SceneSwitcher(
       this.sceneSlot,
@@ -175,6 +179,7 @@ export class App {
     await this.sceneSwitcher.mountInitialScene();
   }
 
+  /** Binds panel buttons to manual and automatic scene switching actions. */
   private setupSceneControls(): void {
     this.sceneButtons.forEach((button, index) => {
       button.addEventListener('click', () => {
@@ -193,6 +198,7 @@ export class App {
     });
   }
 
+  /** Applies scene switch side effects: drag setup, UI state refresh and Skia preview sync. */
   private onSceneSwitched(scene: Container, _index: number): void {
     try {
       this.sceneRoot = scene;
@@ -205,6 +211,7 @@ export class App {
     }
   }
 
+  /** Updates active state for scene buttons and auto-rotate toggle indicator. */
   private updateSceneButtons(): void {
     const activeIndex = this.sceneSwitcher.activeIndex;
 
@@ -215,6 +222,7 @@ export class App {
     this.autoSceneBtn?.classList.toggle('is-active', this.sceneSwitcher.isAutoRotateEnabled);
   }
 
+  /** Recreates drag handlers for current scene descendants and commits pending stroke data. */
   private async setupDragging(): Promise<void> {
     const { DragController } = await import('../scene/draggable');
 
@@ -225,6 +233,7 @@ export class App {
     this.dragController.enableOnDescendants(this.sceneRoot);
   }
 
+  /** Resizes Pixi and Skia canvases to viewport, then invalidates PDF cache and redraws preview. */
   private applyCanvasSize(): void {
     const { width, height } = this.canvasLayout.getViewportCanvasSize();
 
@@ -240,6 +249,7 @@ export class App {
     this.syncSkiaPreview();
   }
 
+  /** Forwards pointer events from Skia canvas to Pixi canvas so both panels can drive interactions. */
   private setupSkiaPointerProxy(): void {
     const pixiView = this._pixiApp.view as HTMLCanvasElement;
     
@@ -313,11 +323,13 @@ export class App {
     });
   }
 
+  /** Renders current Pixi stage and mirrors it to Skia preview canvas. */
   private syncSkiaPreview(): void {
     this._pixiApp.render();
     this.drawPixiViewToSkiaCanvas();
   }
 
+  /** Draws current Pixi canvas bitmap into the Skia preview 2D context. */
   private drawPixiViewToSkiaCanvas(): void {
     const ctx2d = this.skiaCanvas.getContext('2d');
     const pixiView = this._pixiApp.view as HTMLCanvasElement;
@@ -330,6 +342,7 @@ export class App {
     ctx2d.drawImage(pixiView, 0, 0, this.skiaCanvas.width, this.skiaCanvas.height);
   }
 
+  /** Adds a random shape to active scene, enables dragging for it and refreshes preview. */
   private async addRandomShape(): Promise<void> {
     const { RandomShapeFactory } = await import('../scene/randomShape');
     const shape = new RandomShapeFactory().addTo(this.sceneRoot) as Graphics;
@@ -339,6 +352,7 @@ export class App {
     this.syncSkiaPreview();
   }
 
+  /** Clears all objects from active scene and redraws Skia preview. */
   private clearCanvas(): void {
     this.dragController?.clear();
 
@@ -349,6 +363,7 @@ export class App {
     this.syncSkiaPreview();
   }
 
+  /** Exports the active scene to vector PDF with temporary loading state on export button. */
   private async exportPdf(): Promise<void> {
     const previousLabel = this.exportBtn.textContent;
     this.exportBtn.disabled = true;
