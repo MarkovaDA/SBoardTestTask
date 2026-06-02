@@ -1,5 +1,5 @@
 const CACHE = "sboard-static-v1";
-const PRECACHE = ["/assets/app-Y91_T4Vt.js","/assets/canvaskit-pdf-DL6ptVpQ.wasm","/assets/constants-BjyUWcmy.js","/assets/demoScene-COrTueP5.js","/assets/draggable-Cv-Fa6os.js","/assets/index-D-dOu8lc.css","/assets/index-GTjZPRU_.js","/assets/linesScene-BbkfgUMH.js","/assets/pdf-CgJRMq33.js","/assets/pdf-CiIxCHvq.js","/assets/pixi-BZzx2cVF.js","/assets/randomShape-WMDiD0kC.js","/assets/rolldown-runtime-QTnfLwEv.js","/assets/shapesScene-CQsJ0kW4.js","/assets/strokeCommitter-DaoZc73u.js"];
+const PRECACHE = ["/assets/app-CWFvSEQO.js","/assets/canvaskit-pdf-DL6ptVpQ.wasm","/assets/constants-BjyUWcmy.js","/assets/demoScene-COrTueP5.js","/assets/draggable-bhMMGrUf.js","/assets/index-B7oRQK5z.css","/assets/index-BFBat67R.js","/assets/linesScene-BbkfgUMH.js","/assets/pdf-BOs30Gbk.js","/assets/pdf-CiIxCHvq.js","/assets/pixi-BZzx2cVF.js","/assets/randomShape-WMDiD0kC.js","/assets/rolldown-runtime-QTnfLwEv.js","/assets/shapesScene-CQsJ0kW4.js","/assets/strokeCommitter-DaoZc73u.js"];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
