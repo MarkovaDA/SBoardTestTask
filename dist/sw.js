@@ -1,5 +1,5 @@
 const CACHE = "sboard-static-v1";
-const PRECACHE = ["/assets/app-CWFvSEQO.js","/assets/canvaskit-pdf-DL6ptVpQ.wasm","/assets/constants-BjyUWcmy.js","/assets/demoScene-COrTueP5.js","/assets/draggable-bhMMGrUf.js","/assets/index-B7oRQK5z.css","/assets/index-BFBat67R.js","/assets/linesScene-BbkfgUMH.js","/assets/pdf-BOs30Gbk.js","/assets/pdf-CiIxCHvq.js","/assets/pixi-BZzx2cVF.js","/assets/randomShape-WMDiD0kC.js","/assets/rolldown-runtime-QTnfLwEv.js","/assets/shapesScene-CQsJ0kW4.js","/assets/strokeCommitter-DaoZc73u.js"];
+const PRECACHE = ["/SBoardTestTask/assets/app-CO2h9zOr.js","/SBoardTestTask/assets/canvaskit-pdf-DL6ptVpQ.wasm","/SBoardTestTask/assets/constants-BjyUWcmy.js","/SBoardTestTask/assets/demoScene-DitNL_Xl.js","/SBoardTestTask/assets/draggable-CJ4Kizny.js","/SBoardTestTask/assets/index-B7oRQK5z.css","/SBoardTestTask/assets/index-CUdkDXM2.js","/SBoardTestTask/assets/linesScene-Dl9bT69r.js","/SBoardTestTask/assets/pdf-D5PEKunZ.js","/SBoardTestTask/assets/pdf-E-yzXIs8.js","/SBoardTestTask/assets/pixi-B3-iXj9w.js","/SBoardTestTask/assets/randomShape-B-jE0aCo.js","/SBoardTestTask/assets/rolldown-runtime-QTnfLwEv.js","/SBoardTestTask/assets/shapesScene-CyEv-OuF.js","/SBoardTestTask/assets/strokeCommitter-BVQkEG07.js"];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
