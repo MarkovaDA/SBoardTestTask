@@ -1,3 +1,4 @@
+export type { RandomShapeStrategy } from './randomShapeStrategy';
 export type { DragChangeCallback } from './drag';
 export type { SkiaRendererOptions } from './renderer';
 export type { SkiaCanvasKitApi } from './skiaCanvasKit';

@@ -25,7 +25,7 @@ import {
   RANDOM_SHAPE_TRIANGLE_HEIGHT,
   RANDOM_SHAPE_TRIANGLE_LINE_WIDTH,
 } from './constants';
-import type { RandomShapeStrategy } from './randomShapeStrategy';
+import type { RandomShapeStrategy } from '../types/randomShapeStrategy';
 
 const pickFillColor = (): (typeof RANDOM_SHAPE_FILL_COLORS)[number] =>
   RANDOM_SHAPE_FILL_COLORS[Math.floor(Math.random() * RANDOM_SHAPE_FILL_COLORS.length)]!;
