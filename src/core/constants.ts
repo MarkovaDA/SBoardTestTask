@@ -14,3 +14,8 @@ export const PDF_EXPORT_BUTTON_LABEL = 'Экспорт в PDF';
 export const PDF_EXPORT_LOADING_LABEL = 'Подготовка PDF…';
 
 export const SCENE_AUTO_SWITCH_MS = 4000;
+
+export const PROGRESS_LOADING_PIXI = 'Загрузка Pixi';
+export const PROGRESS_LOADING_CANVAS = 'Инициализация canvas';
+export const PROGRESS_CHECKING_INTERFACE = 'Проверка интерфейса';
+export const PROGRESS_LOADING_SCENE = 'Загрузка сцены'

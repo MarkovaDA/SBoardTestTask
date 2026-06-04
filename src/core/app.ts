@@ -17,12 +17,17 @@ import {
   PDF_EXPORT_FILENAME,
   PDF_EXPORT_LOADING_LABEL,
   PIXI_RESOLUTION,
+  PROGRESS_CHECKING_INTERFACE,
+  PROGRESS_LOADING_CANVAS,
+  PROGRESS_LOADING_PIXI,
+  PROGRESS_LOADING_SCENE,
   SCENE_AUTO_SWITCH_MS,
   SCENE_BACKGROUND,
 } from './constants';
 
 export type AppBootProgress = (message: string) => void;
 
+// todo: refactoring 
 export class App {
   private readonly _pixiApp: Application;
   private readonly sceneSlot: Container;
@@ -51,7 +56,7 @@ export class App {
     this.onSceneSwitched(scene, index);
   };
 
-  /** Creates App with already prepared runtime dependencies. */
+  /** Creates app with already prepared runtime dependencies. */
   private constructor(
     pixiApp: Application,
     sceneSlot: Container,
@@ -70,7 +75,7 @@ export class App {
 
   /** Bootstraps DOM, Pixi stage, controls and scene lifecycle, then returns ready App instance. */
   static async create(onProgress?: AppBootProgress): Promise<App> {
-    onProgress?.('Проверка интерфейса…');
+    onProgress?.(PROGRESS_CHECKING_INTERFACE);
 
     const pixiContainer = document.getElementById('pixi-container');
     const skiaCanvas = document.getElementById('skia-canvas');
@@ -97,6 +102,7 @@ export class App {
 
     for (let index = 0; index < preparedScenes.sceneCount; index += 1) {
       const button = document.getElementById(`btn-scene-${index}`);
+      
       if (!(button instanceof HTMLButtonElement)) {
         throw new Error(`Scene button btn-scene-${index} not found`);
       }
@@ -105,17 +111,21 @@ export class App {
     }
 
     const canvasLayout = new CanvasLayout();
+
     const { width, height } = canvasLayout.getViewportCanvasSize();
+
     const renderOptions: SkiaRendererOptions = {
       width,
       height,
       background: SCENE_BACKGROUND,
     };
 
-    onProgress?.('Загрузка Pixi…');
+    onProgress?.(PROGRESS_LOADING_PIXI);
+    
     const { Application, Container } = await import('pixi.js-legacy');
 
-    onProgress?.('Инициализация canvas…');
+    onProgress?.(PROGRESS_LOADING_CANVAS);
+    
     const pixiApp = new Application({
       width: renderOptions.width,
       height: renderOptions.height,
@@ -142,8 +152,10 @@ export class App {
     app.sceneButtons.push(...sceneButtons);
     app.autoSceneBtn = autoSceneBtn;
 
-    onProgress?.('Загрузка сцены…');
+    onProgress?.(PROGRESS_LOADING_SCENE);
+    
     await app.initSceneSwitcher();
+    
     app.setupSceneControls();
 
     exportBtn.addEventListener('click', () => {
