@@ -1,6 +1,6 @@
 import './style.css';
 
-import { setControlPanelReady } from './ui/control-panel';
+import { setControlPanelReady } from './ui/controlPanel';
 import { AppLoader, CanvasPanelLoader } from './ui/loader';
 
 /** Handles register service worker logic. */

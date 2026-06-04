@@ -1,4 +1,4 @@
-export type AppDomElements = {
+export type DomElements = {
   pixiContainer: HTMLElement;
   skiaCanvas: HTMLCanvasElement;
   exportBtn: HTMLButtonElement;
@@ -9,7 +9,7 @@ export type AppDomElements = {
 };
 
 /** Resolves required DOM nodes for application bootstrap. */
-export function collectAppDom(sceneCount: number): AppDomElements {
+export function collectDom(sceneCount: number): DomElements {
   const pixiContainer = document.getElementById('pixi-container');
   const skiaCanvas = document.getElementById('skia-canvas');
   const exportBtn = document.getElementById('btn-export-pdf');

@@ -5,7 +5,7 @@ import type { DragController } from '../scene/draggable';
 import { PreparedScenes } from '../scene/preparedScenes';
 import { SceneSwitcher } from '../scene/sceneSwitcher';
 import { SCENE_AUTO_SWITCH_MS } from './constants';
-import type { PixiRuntime } from './pixi-runtime';
+import type { PixiRuntime } from './pixiRuntime';
 
 /** Scene switching, panel controls and drag interaction on the active scene. */
 export class SceneRuntime {

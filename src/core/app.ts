@@ -1,7 +1,7 @@
 ﻿import type { SkiaRendererOptions } from '../types';
 import { PreparedScenes } from '../scene/preparedScenes';
-import { setControlPanelReady } from '../ui/control-panel';
-import { collectAppDom } from './app-dom';
+import { setControlPanelReady } from '../ui/controlPanel';
+import { collectDom } from './dom';
 import {
   PIXI_RESOLUTION,
   PROGRESS_CHECKING_INTERFACE,
@@ -11,11 +11,11 @@ import {
   SCENE_BACKGROUND,
 } from './constants';
 import { CanvasLayout } from './layout';
-import { PdfExport } from './pdf-export';
-import { PixiRuntime } from './pixi-runtime';
-import { SceneRuntime } from './scene-runtime';
-import { SceneEditor } from './scene-editor';
-import { SkiaPreview } from './skia-preview';
+import { PdfExport } from './pdfExport';
+import { PixiRuntime } from './pixiRuntime';
+import { SceneRuntime } from './sceneRuntime';
+import { SceneEditor } from './sceneEditor';
+import { SkiaPreview } from './skiaPreview';
 
 export type AppBootProgress = (message: string) => void;
 
@@ -73,7 +73,7 @@ export class App {
     onProgress?.(PROGRESS_CHECKING_INTERFACE);
 
     const preparedScenes = new PreparedScenes();
-    const dom = collectAppDom(preparedScenes.sceneCount);
+    const dom = collectDom(preparedScenes.sceneCount);
     const canvasLayout = new CanvasLayout();
     const { width, height } = canvasLayout.getViewportCanvasSize();
 
