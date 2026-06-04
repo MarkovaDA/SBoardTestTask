@@ -30,9 +30,10 @@ import {
   DEMO_SUB_CONTAINER_X,
   DEMO_SUB_CONTAINER_Y,
 } from './constants';
+import type { SceneBuilder } from './sceneBuilder';
 
 /** Demo scene from the task pseudocode. */
-export class DemoScene {
+export class DemoScene implements SceneBuilder {
   /** Handles build logic. */
   build(): Container {
     const mainContainer = new Container();

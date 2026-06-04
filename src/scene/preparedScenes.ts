@@ -1,20 +1,18 @@
 ﻿import type { Container } from 'pixi.js-legacy';
 
-const SCENE_LABELS = ['Демо (ТЗ)', 'Фигуры', 'Линии'] as const;
+import { SCENE_REGISTRY } from './sceneRegistry';
 
 /** Builds preset scenes on demand and caches them for switching. */
 export class PreparedScenes {
-  readonly sceneCount = SCENE_LABELS.length;
+  readonly sceneCount = SCENE_REGISTRY.length;
 
-  private readonly cache: (Container | null)[] = SCENE_LABELS.map(() => null);
+  private readonly cache: (Container | null)[] = SCENE_REGISTRY.map(() => null);
   private readonly loading = new Map<number, Promise<Container>>();
 
-  /** Handles get label logic. */
   getLabel(index: number): string {
-    return SCENE_LABELS[index] ?? `Scene ${index}`;
+    return SCENE_REGISTRY[index]?.label ?? `Scene ${index}`;
   }
 
-  /** Handles get scene logic. */
   getScene(index: number): Container {
     const container = this.cache[index];
     if (!container) {
@@ -23,7 +21,6 @@ export class PreparedScenes {
     return container;
   }
 
-  /** Handles ensure scene logic. */
   async ensureScene(index: number): Promise<Container> {
     const cached = this.cache[index];
     if (cached) {
@@ -45,23 +42,13 @@ export class PreparedScenes {
     return loadPromise;
   }
 
-  /** Handles load scene logic. */
   private async loadScene(index: number): Promise<Container> {
-    switch (index) {
-      case 0: {
-        const { DemoScene } = await import('./demoScene');
-        return new DemoScene().build();
-      }
-      case 1: {
-        const { ShapesScene } = await import('./shapesScene');
-        return new ShapesScene().build();
-      }
-      case 2: {
-        const { LinesScene } = await import('./linesScene');
-        return new LinesScene().build();
-      }
-      default:
-        throw new Error(`Unknown scene index: ${index}`);
+    const entry = SCENE_REGISTRY[index];
+    if (!entry) {
+      throw new Error(`Unknown scene index: ${index}`);
     }
+
+    const Builder = await entry.load();
+    return new Builder().build();
   }
 }

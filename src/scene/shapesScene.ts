@@ -18,9 +18,10 @@ import {
   SHAPES_TRIANGLE_X,
   SHAPES_TRIANGLE_Y,
 } from './constants';
+import type { SceneBuilder } from './sceneBuilder';
 
 /** Prepared scene: filled primitives. */
-export class ShapesScene {
+export class ShapesScene implements SceneBuilder {
   /** Handles build logic. */
   build(): Container {
     const root = new Container();

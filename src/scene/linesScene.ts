@@ -7,9 +7,10 @@ import {
   LINES_SCENE_STROKE_C,
   LINES_SCENE_STROKE_D,
 } from './constants';
+import type { SceneBuilder } from './sceneBuilder';
 
 /** Prepared scene: several open strokes (lines). */
-export class LinesScene {
+export class LinesScene implements SceneBuilder {
   /** Handles build logic. */
   build(): Container {
     const root = new Container();
