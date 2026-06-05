@@ -25,7 +25,24 @@ export class SkiaPreview {
       return;
     }
 
+    const remapPointerCoords = (event: PointerEvent): { clientX: number; clientY: number } => {
+      const skiaRect = this.skiaCanvas.getBoundingClientRect();
+      const pixiRect = pixiView.getBoundingClientRect();
+
+      const relX = skiaRect.width > 0 ? (event.clientX - skiaRect.left) / skiaRect.width : 0;
+      const relY = skiaRect.height > 0 ? (event.clientY - skiaRect.top) / skiaRect.height : 0;
+
+      return {
+        clientX: pixiRect.left + relX * pixiRect.width,
+        clientY: pixiRect.top + relY * pixiRect.height,
+      };
+    };
+
     const forwardPointerEvent = (event: PointerEvent, type: string): void => {
+      const { clientX, clientY } = remapPointerCoords(event);
+      const deltaX = clientX - event.clientX;
+      const deltaY = clientY - event.clientY;
+
       const forwarded = new PointerEvent(type, {
         bubbles: true,
         cancelable: true,
@@ -33,10 +50,10 @@ export class SkiaPreview {
         pointerId: event.pointerId,
         pointerType: event.pointerType,
         isPrimary: event.isPrimary,
-        clientX: event.clientX,
-        clientY: event.clientY,
-        screenX: event.screenX,
-        screenY: event.screenY,
+        clientX,
+        clientY,
+        screenX: event.screenX + deltaX,
+        screenY: event.screenY + deltaY,
         button: event.button,
         buttons: event.buttons,
         ctrlKey: event.ctrlKey,
